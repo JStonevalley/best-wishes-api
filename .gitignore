@@ -83,3 +83,6 @@ typings/
 # Ignore build directory
 
 # End of https://www.gitignore.io/api/node,serverless
+
+# dynamodb directories
+.dynamodb

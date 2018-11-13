@@ -1,7 +1,13 @@
 service: best-wishes-api
 
 plugins:
+  - serverless-dynamodb-local
   - serverless-offline
+
+custom:
+  dynamodb:
+    start:
+      migrate: true
 
 provider:
   name: aws
@@ -9,6 +15,17 @@ provider:
   stage: ${opt:stage}
   region: eu-west-2
   profile: best-wishes-api
+  iamRoleStatements:
+  - Effect: Allow
+    Action:
+      - dynamodb:Query
+      - dynamodb:Scan
+      - dynamodb:GetItem
+      - dynamodb:PutItem
+      - dynamodb:UpdateItem
+      - dynamodb:DeleteItem
+    Resource:
+      - { "Fn::GetAtt": ["UsersDynamoDBTable", "Arn" ] }
   environment: ${file(./serverless.env.yml):${opt:stage}}
 
 functions:
@@ -17,3 +34,22 @@ functions:
     events:
       - http: ANY /
       - http: 'ANY {proxy+}'
+
+
+resources:
+  Resources:
+    UsersDynamoDBTable:
+      Type: 'AWS::DynamoDB::Table'
+      Properties:
+        AttributeDefinitions:
+          -
+            AttributeName: id
+            AttributeType: S
+        KeySchema:
+          -
+            AttributeName: id
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        TableName: ${self:provider.environment.USER_TABLE}
