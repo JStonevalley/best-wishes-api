@@ -1,0 +1,28 @@
+{
+  "name": "best-wishes-api",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "local": "serverless offline start --stage local --port 3001",
+    "deploy": "serverless deploy --stage prod"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "aws-sdk": "^2.348.0",
+    "body-parser": "^1.18.3",
+    "domino": "^2.1.0",
+    "express": "^4.16.4",
+    "isomorphic-fetch": "^2.2.1",
+    "jsdom": "^13.0.0",
+    "page-metadata-parser": "^1.1.2",
+    "serverless": "^1.32.0",
+    "serverless-http": "^1.8.0"
+  },
+  "devDependencies": {
+    "serverless-offline": "^3.31.2"
+  }
+}

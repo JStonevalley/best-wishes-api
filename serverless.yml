@@ -1,0 +1,19 @@
+service: best-wishes-api
+
+plugins:
+  - serverless-offline
+
+provider:
+  name: aws
+  runtime: nodejs8.10
+  stage: ${opt:stage}
+  region: eu-west-2
+  profile: best-wishes-api
+  environment: ${file(./serverless.env.yml):${opt:stage}}
+
+functions:
+  app:
+    handler: src/index.handler
+    events:
+      - http: ANY /
+      - http: 'ANY {proxy+}'
