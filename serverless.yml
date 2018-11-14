@@ -14,7 +14,7 @@ custom:
 provider:
   name: aws
   runtime: nodejs8.10
-  stage: ${opt:stage}
+  stage: ${opt:stage, 'local'}
   region: eu-west-2
   profile: best-wishes-api
   iamRoleStatements:
@@ -28,7 +28,7 @@ provider:
       - dynamodb:DeleteItem
     Resource:
       - { "Fn::GetAtt": ["UsersDynamoDBTable", "Arn" ] }
-  environment: ${file(./serverless.env.yml):${opt:stage}}
+  environment: ${file(./serverless.env.yml):${opt:stage, 'local'}}
 
 functions:
   app:
