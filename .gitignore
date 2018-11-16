@@ -86,3 +86,6 @@ typings/
 
 # dynamodb directories
 .dynamodb
+
+# rethinkDB directories
+rethinkdb
