@@ -4,18 +4,8 @@ const bodyParser = require('body-parser')
 const {getMetadata} = require('page-metadata-parser')
 const domino = require('domino')
 const fetch = require('isomorphic-fetch')
-const uuidv1 = require('uuid/v1')
 const yup = require('yup')
-const validateUuid = require('uuid-validate')
-const AWS = require('aws-sdk')
-
-yup.addMethod(yup.string, 'uuid', function () {
-  return this.test(
-    'uuid-test',
-    'Invalid uuid/v1',
-    (value) => validateUuid(value, v1) || this.createError({message: 'Invalid uuid/v1'})
-  )
-})
+r = require('rethinkdb')
 
 const app = express()
 app.use(bodyParser.json())
@@ -23,13 +13,13 @@ app.use(bodyParser.json())
 
 const USER_TABLE = process.env.USER_TABLE
 
-const dynamoDb = process.env.IS_OFFLINE === 'true'
-  ? new AWS.DynamoDB.DocumentClient({
-    region: 'localhost',
-    endpoint: 'http://localhost:8000'
-  })
-  : new AWS.DynamoDB.DocumentClient()
-console.log(dynamoDb)
+const connectionP = (process.env.IS_OFFLINE === 'true'
+  ? r.connect({ host: 'localhost', port: 28015 })
+  : r.connect({ host: 'localhost', port: 28015 })
+).then(async (conn) => {
+  await conn.use(process.env.ENV)
+  return conn
+})
 
 app.get('/', function (req, res) {
   res.json({message: `Hello ${process.env.ENV}!`})
@@ -43,18 +33,22 @@ app.post('/fetch-page-meta', async ({body: {url}}, res) => {
   res.json(getMetadata(doc, url))
 })
 
+const userValidation = yup.object().shape({
+  email: yup.string().email().required(),
+})
 
-app.get('/user/:id', async ({params: {id}}, res) => {
-  const params = {
-    TableName: USERS_TABLE,
-    Key: {
-      id,
-    },
-  }
+app.get('/user/:email', async ({params: {email}}, res) => {
+  console.log(email)
   try {
-    const {Item} = await dynamoDb.get(params).promise()
-    Item
-      ? res.json(Item)
+    userValidation.validateSync({email})
+  } catch (error) {
+    res.status(400).json(error)
+  }
+  const conn = await connectionP
+  try {
+    const data = r.table(USER_TABLE).get(email).run(conn)
+    data
+      ? res.json(data)
       : res.status(404).json({ error: "User not found" })
   } catch (error) {
     console.log(error)
@@ -62,32 +56,24 @@ app.get('/user/:id', async ({params: {id}}, res) => {
   }
 })
 
-const userValidation = yup.object().shape({
-  id: yup.string().uuid().required(),
-  email: yup.string().email().required(),
-})
-
 app.post('/user', async (req, res) => {
   const { email } = req.body
   const newUser = {
-    id: uuidv1(),
     email
   }
   try {
-    userValidation.isValidSync(newUser)
+    userValidation.validateSync(newUser)
   } catch (error) {
     res.status(400).json(error)
   }
-  const params = {
-    TableName: USER_TABLE,
-    Item: newUser
-  }
+  const conn = await connectionP
   try {
-    await dynamoDb.put(params)
+    const {first_error} = await r.table(USER_TABLE).insert(newUser).run(conn)
+    if (first_error && first_error.startsWith('Duplicate primary key')) throw new yup.ValidationError('User already exists', newUser, 'email')
     res.json(newUser)
   } catch (error) {
     console.error(error)
-    res.status(400).json({ error: 'Could not create user' })
+    res.status(400).json(error)
   }
 })
   
