@@ -109,7 +109,7 @@ app.get('/wish-list', async ({query: {email}}, res) => {
 })
 
 app.put('/wish-list', async (req, res) => {
-  const wishlist = req.body
+  const {id, ...wishlist} = req.body
   try {
     wishListValidation.validateSync(wishlist)
   } catch (error) {
@@ -117,11 +117,11 @@ app.put('/wish-list', async (req, res) => {
   }
   const conn = await connectionP
   try {
-    const {first_error} = wishlist.id
-      ? await r.table(WISH_LIST_TABLE).update(wishlist).run(conn)
+    const {first_error, generated_keys, inserted} = id
+      ? await r.table(WISH_LIST_TABLE).get(id).update(wishlist).run(conn)
       : await r.table(WISH_LIST_TABLE).insert(wishlist).run(conn)
     if (first_error) throw new Error(first_error)
-    res.json(wishlist)
+    res.json({id: inserted ? generated_keys[0]: id, ...wishlist})
   } catch (error) {
     console.error(error)
     res.status(400).json({ error: 'Could not save wish list'})
