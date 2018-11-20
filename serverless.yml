@@ -1,7 +1,6 @@
 service: best-wishes-api
 
 plugins:
-  - serverless-dynamodb-local
   - serverless-offline
 
 custom:
@@ -9,12 +8,6 @@ custom:
     stages:
       - local
     port: 3001
-  dynamodb:
-    stages:
-      - local
-    start:
-      migrate: true
-      port: 8000
 
 provider:
   name: aws
@@ -22,17 +15,6 @@ provider:
   stage: ${opt:stage, 'local'}
   region: eu-west-2
   profile: best-wishes-api
-  iamRoleStatements:
-  - Effect: Allow
-    Action:
-      - dynamodb:Query
-      - dynamodb:Scan
-      - dynamodb:GetItem
-      - dynamodb:PutItem
-      - dynamodb:UpdateItem
-      - dynamodb:DeleteItem
-    Resource:
-      - { "Fn::GetAtt": ["UsersDynamoDBTable", "Arn" ] }
   environment: ${file(./serverless.env.yml):${opt:stage, 'local'}}
 
 functions:
@@ -41,22 +23,3 @@ functions:
     events:
       - http: ANY /
       - http: 'ANY {proxy+}'
-
-
-resources:
-  Resources:
-    UsersDynamoDBTable:
-      Type: 'AWS::DynamoDB::Table'
-      Properties:
-        AttributeDefinitions:
-          -
-            AttributeName: id
-            AttributeType: S
-        KeySchema:
-          -
-            AttributeName: id
-            KeyType: HASH
-        ProvisionedThroughput:
-          ReadCapacityUnits: 1
-          WriteCapacityUnits: 1
-        TableName: ${self:provider.environment.USER_TABLE}
