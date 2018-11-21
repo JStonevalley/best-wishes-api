@@ -86,7 +86,8 @@ const wishListValidation = yup.object().shape({
     title: yup.string().required(),
     body: yup.string().notRequired(),
     link: yup.string().notRequired(),
-    image: yup.string().notRequired()
+    image: yup.string().notRequired(),
+    buyer: yup.string().email().notRequired()
   }))
 })
 
