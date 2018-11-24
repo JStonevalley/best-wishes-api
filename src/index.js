@@ -44,9 +44,9 @@ app.get('/user/:email', async ({params: {email}}, res) => {
   }
   const conn = await connectionP
   try {
-    const data = await r.table(USER_TABLE).get(email).run(conn)
-    data
-      ? res.json(data)
+    const user = await r.table(USER_TABLE).get(email).run(conn)
+    user
+      ? res.json(user)
       : res.status(404).json({ error: "User not found" })
   } catch (error) {
     console.log(error)
@@ -78,17 +78,19 @@ app.post('/user', async (req, res) => {
 
 const WISH_LIST_TABLE = process.env.WISH_LIST_TABLE
 
+const wishValidation = yup.object().shape({
+  id: yup.string().notRequired(),
+  title: yup.string().required(),
+  body: yup.string().notRequired(),
+  link: yup.string().notRequired(),
+  image: yup.string().notRequired()
+})
+
 const wishListValidation = yup.object().shape({
   id: yup.string().notRequired(),
   title: yup.string().required(),
   owner: yup.string().email().required(),
-  wishes: yup.array().of(yup.object().shape({
-    title: yup.string().required(),
-    body: yup.string().notRequired(),
-    link: yup.string().notRequired(),
-    image: yup.string().notRequired(),
-    buyer: yup.string().email().notRequired()
-  }))
+  wishes: yup.array().of(wishValidation)
 })
 
 app.get('/wish-list', async ({query: {email}}, res) => {
@@ -99,10 +101,15 @@ app.get('/wish-list', async ({query: {email}}, res) => {
   }
   const conn = await connectionP
   try {
-    const data = await (await r.table(WISH_LIST_TABLE).filter({owner: email}).run(conn)).toArray()
-    data
-      ? res.json(data)
-      : res.status(404).json({ error: "Wish list ot found" })
+    const wishLists = await (await r.table(WISH_LIST_TABLE).filter({owner: email}).run(conn)).toArray()
+    const wishListsWithWishes = await Promise.all(
+      wishLists
+        .map(async (wishList) => {
+          wishList.wishes = await getWishes(wishList.wishes)
+          return wishList
+        })
+    )
+    res.json(wishListsWithWishes)
     } catch (error) {
       console.log(error)
       res.status(400).json({ error: 'Could not get wish lists' })
@@ -118,17 +125,42 @@ app.put('/wish-list', async (req, res) => {
   }
   const conn = await connectionP
   try {
-    const {first_error, generated_keys, inserted} = id
+    const savedWishes = await saveWishes(wishlist.wishes)
+    wishlist.wishes = savedWishes.map((wish) => wish.id)
+    const {first_error, generated_keys, inserted, skipped} = id
       ? await r.table(WISH_LIST_TABLE).get(id).update(wishlist).run(conn)
       : await r.table(WISH_LIST_TABLE).insert(wishlist).run(conn)
     if (first_error) throw new Error(first_error)
-    res.json({id: inserted ? generated_keys[0]: id, ...wishlist})
+    if (skipped) throw new Error('Skipped')
+    const savedWishlist = {id: inserted ? generated_keys[0]: id, ...wishlist}
+    savedWishlist.wishes = savedWishlist.wishes.map((wishId) => savedWishes.find((wish) => wish.id === wishId))
+    res.json(savedWishlist)
   } catch (error) {
     console.error(error)
-    res.status(400).json({ error: 'Could not save wish list'})
+    res.status(400).json({ error: `Could not save wish list${id && ': ' + id}`})
   }
 })
-  
+
+const WISH_TABLE = process.env.WISH_TABLE
+
+const saveWishes = (wishes) =>  Promise.all(wishes.map(saveWish))
+
+const saveWish = async (wish) => {
+  const conn = await connectionP
+  const {id, ...wishContent} = wish
+  const {first_error, generated_keys, inserted} = id
+    ? await r.table(WISH_TABLE).get(id).update(wishContent).run(conn)
+    : await r.table(WISH_TABLE).insert(wishContent).run(conn)
+  if (first_error) throw new Error(first_error)
+  return {id: inserted ? generated_keys[0]: id, ...wishContent}
+}
+
+const getWishes = (ids) => Promise.all(ids.map(getWish))
+
+const getWish = async (id) => {
+  const conn = await connectionP
+  return r.table(WISH_TABLE).get(id).run(conn)
+}
 
 module.exports = {
   handler: serverless(app)
