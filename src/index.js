@@ -41,6 +41,7 @@ app.get('/user/:email', async ({params: {email}}, res) => {
     userValidation.validateSync({email})
   } catch (error) {
     res.status(400).json(error)
+    return
   }
   const conn = await connectionP
   try {
@@ -63,6 +64,7 @@ app.post('/user', async (req, res) => {
     userValidation.validateSync(newUser)
   } catch (error) {
     res.status(400).json(error)
+    return
   }
   const conn = await connectionP
   try {
@@ -98,6 +100,7 @@ app.get('/wish-list', async ({query: {email}}, res) => {
     userValidation.validateSync({email})
   } catch (error) {
     res.status(400).json(error)
+    return
   }
   const conn = await connectionP
   try {
@@ -122,6 +125,7 @@ app.put('/wish-list', async (req, res) => {
     wishListValidation.validateSync(wishlist)
   } catch (error) {
     res.status(400).json(error)
+    return
   }
   const conn = await connectionP
   try {
