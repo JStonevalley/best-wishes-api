@@ -6,6 +6,7 @@ const domino = require('domino')
 const fetch = require('isomorphic-fetch')
 const yup = require('yup')
 const r = require('rethinkdb')
+const WishDB = require('./wish')
 
 const app = express()
 app.use(bodyParser.json())
@@ -17,6 +18,8 @@ const connectionP = (process.env.IS_OFFLINE === 'true'
   await conn.use(process.env.ENV)
   return conn
 })
+
+const wishDb = new WishDB(connectionP)
 
 app.get('/', function (req, res) {
   res.json({ message: `Hello ${process.env.ENV}!` })
@@ -74,7 +77,7 @@ app.post('/user', async (req, res) => {
     res.json(newUser)
   } catch (error) {
     console.error(error)
-    res.status(400).json({ error: 'Clould not save user' })
+    res.status(400).json({ error: 'Could not save user' })
   }
 })
 
@@ -85,17 +88,17 @@ const wishValidation = yup.object().shape({
   title: yup.string().required(),
   body: yup.string().notRequired(),
   link: yup.string().notRequired(),
-  image: yup.string().notRequired()
+  image: yup.string().notRequired(),
+  wishList: yup.string().required()
 })
 
 const wishListValidation = yup.object().shape({
   id: yup.string().notRequired(),
   title: yup.string().required(),
-  owner: yup.string().email().required(),
-  wishes: yup.array().of(wishValidation)
+  owner: yup.string().email().required()
 })
 
-app.get('/wish-list', async ({ query: { email } }, res) => {
+app.get('/wish-list', async ({ query: { email, withWishes } }, res) => {
   try {
     userValidation.validateSync({ email })
   } catch (error) {
@@ -105,14 +108,8 @@ app.get('/wish-list', async ({ query: { email } }, res) => {
   const conn = await connectionP
   try {
     const wishLists = await (await r.table(WISH_LIST_TABLE).filter({ owner: email }).run(conn)).toArray()
-    const wishListsWithWishes = await Promise.all(
-      wishLists
-        .map(async (wishList) => {
-          wishList.wishes = await getWishes(wishList.wishes)
-          return wishList
-        })
-    )
-    res.json(wishListsWithWishes)
+    const wishes = withWishes ? await wishDb.getWishesForWishLists(wishLists.map((wishList) => wishList.id)) : []
+    res.json({ wishLists, wishes })
   } catch (error) {
     console.log(error)
     res.status(400).json({ error: 'Could not get wish lists' })
@@ -129,15 +126,12 @@ app.put('/wish-list', async (req, res) => {
   }
   const conn = await connectionP
   try {
-    const savedWishes = await saveWishes(wishlist.wishes)
-    wishlist.wishes = savedWishes.map((wish) => wish.id)
     const { first_error: firstError, generated_keys: generatedKeys, inserted, skipped } = id
       ? await r.table(WISH_LIST_TABLE).get(id).update(wishlist).run(conn)
       : await r.table(WISH_LIST_TABLE).insert(wishlist).run(conn)
     if (firstError) throw new Error(firstError)
     if (skipped) throw new Error('Skipped')
     const savedWishlist = { id: inserted ? generatedKeys[0] : id, ...wishlist }
-    savedWishlist.wishes = savedWishlist.wishes.map((wishId) => savedWishes.find((wish) => wish.id === wishId))
     res.json(savedWishlist)
   } catch (error) {
     console.error(error)
@@ -145,26 +139,22 @@ app.put('/wish-list', async (req, res) => {
   }
 })
 
-const WISH_TABLE = process.env.WISH_TABLE
-
-const saveWishes = (wishes) => Promise.all(wishes.map(saveWish))
-
-const saveWish = async (wish) => {
-  const conn = await connectionP
-  const { id, ...wishContent } = wish
-  const { first_error: firstError, generated_keys: generatedKeys, inserted } = id
-    ? await r.table(WISH_TABLE).get(id).update(wishContent).run(conn)
-    : await r.table(WISH_TABLE).insert(wishContent).run(conn)
-  if (firstError) throw new Error(firstError)
-  return { id: inserted ? generatedKeys[0] : id, ...wishContent }
-}
-
-const getWishes = (ids) => Promise.all(ids.map(getWish))
-
-const getWish = async (id) => {
-  const conn = await connectionP
-  return r.table(WISH_TABLE).get(id).run(conn)
-}
+app.put('/wish', async (req, res) => {
+  const { wish } = req.body
+  try {
+    wishValidation.validateSync(wish)
+  } catch (error) {
+    res.status(400).json(error)
+    return
+  }
+  try {
+    const newWish = await wishDb.saveWish(wish)
+    res.json(newWish)
+  } catch (error) {
+    console.error(error)
+    res.status(400).json({ error: `Could not save wish` })
+  }
+})
 
 module.exports = {
   handler: serverless(app)
