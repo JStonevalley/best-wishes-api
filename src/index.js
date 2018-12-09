@@ -140,7 +140,8 @@ app.put('/wish-list', async (req, res) => {
 })
 
 app.put('/wish', async (req, res) => {
-  const { wish } = req.body
+  const wish = req.body
+  if (!wish.id) delete wish.id
   try {
     wishValidation.validateSync(wish)
   } catch (error) {

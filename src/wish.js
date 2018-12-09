@@ -26,6 +26,7 @@ class WishDB {
   }
 
   async getWishesForWishLists (wishListIds) {
+    if (!wishListIds || wishListIds.length === 0) return []
     const conn = await this.cp
     return (await r.table(WISH_TABLE).getAll(...wishListIds, { index: 'wishList' }).run(conn)).toArray()
   }
