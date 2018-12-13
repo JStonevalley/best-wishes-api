@@ -157,6 +157,22 @@ app.put('/wish', async (req, res) => {
   }
 })
 
+app.delete('/wish/:id', async ({ params: { id } }, res) => {
+  try {
+    yup.string().required().validateSync(id)
+  } catch (error) {
+    res.status(400).json(error)
+    return
+  }
+  try {
+    await wishDb.deleteWish(id)
+    res.json({ id })
+  } catch (error) {
+    console.error(error)
+    res.status(400).json({ error: `Could not delete wish` })
+  }
+})
+
 module.exports = {
   handler: serverless(app)
 }

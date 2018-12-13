@@ -35,6 +35,11 @@ class WishDB {
     const conn = await this.cp
     return r.table(WISH_TABLE).get(id).run(conn)
   }
+
+  async deleteWish (id) {
+    const conn = await this.cp
+    return r.table(WISH_TABLE).get(id).delete().run(conn)
+  }
 }
 
 module.exports = WishDB
