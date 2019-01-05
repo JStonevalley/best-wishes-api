@@ -4,10 +4,10 @@ const bodyParser = require('body-parser')
 const { getMetadata } = require('page-metadata-parser')
 const domino = require('domino')
 const fetch = require('isomorphic-fetch')
-const yup = require('yup')
 const r = require('rethinkdb')
 const WishDB = require('./wish')
 const WishListDB = require('./wishList')
+const yup = require('yup')
 
 const app = express()
 app.use(bodyParser.json())
@@ -83,68 +83,29 @@ app.post('/user', async (req, res) => {
   }
 })
 
-const wishValidation = yup.object().shape({
-  id: yup.string().notRequired(),
-  title: yup.string().required(),
-  body: yup.string().notRequired(),
-  link: yup.string().notRequired(),
-  image: yup.string().notRequired(),
-  wishList: yup.string().required()
-})
-
-const sharedToValidator = yup.array().of(yup.string().email())
-
-const wishListValidation = yup.object().shape({
-  id: yup.string().notRequired(),
-  title: yup.string().required(),
-  owner: yup.string().email().required(),
-  sharedTo: sharedToValidator
-})
-
 app.get('/wish-list', async ({ query: { email, withWishes } }, res) => {
-  try {
-    userValidation.validateSync({ email })
-  } catch (error) {
-    res.status(400).json(error)
-    return
-  }
   try {
     res.json(await wishListDb.getWishListsForOwner(email, withWishes))
   } catch (error) {
-    console.log(error)
-    res.status(400).json({ error: 'Could not get wish lists' })
+    res.status(400).json(error)
   }
 })
 
 app.post('/wish-list', async (req, res) => {
   const wishList = req.body
   try {
-    wishListValidation.validateSync(wishList)
-  } catch (error) {
-    res.status(400).json(error)
-    return
-  }
-  try {
     res.json(await wishListDb.createWishList(wishList))
   } catch (error) {
-    console.error(error)
-    res.status(400).json({ error: `Could not save wish list` })
+    res.status(400).json(error)
   }
 })
 
 app.put('/wish-list/share', async (req, res) => {
   const { id, sharedTo } = req.body
   try {
-    sharedToValidator.validateSync(sharedTo)
-  } catch (error) {
-    res.status(400).json(error)
-    return
-  }
-  try {
     res.json(wishListDb.shareWishList(id, sharedTo))
   } catch (error) {
-    console.error(error)
-    res.status(400).json({ error: `Could not share wish list${id && ': ' + id}` })
+    res.status(400).json(error)
   }
 })
 
@@ -152,33 +113,18 @@ app.put('/wish', async (req, res) => {
   const wish = req.body
   if (!wish.id) delete wish.id
   try {
-    wishValidation.validateSync(wish)
+    res.json(await wishDb.saveWish(wish))
   } catch (error) {
     res.status(400).json(error)
-    return
-  }
-  try {
-    const newWish = await wishDb.saveWish(wish)
-    res.json(newWish)
-  } catch (error) {
-    console.error(error)
-    res.status(400).json({ error: `Could not save wish` })
   }
 })
 
 app.delete('/wish/:id', async ({ params: { id } }, res) => {
   try {
-    yup.string().required().validateSync(id)
-  } catch (error) {
-    res.status(400).json(error)
-    return
-  }
-  try {
     await wishDb.deleteWish(id)
     res.json({ id })
   } catch (error) {
-    console.error(error)
-    res.status(400).json({ error: `Could not delete wish` })
+    res.status(400).json(error)
   }
 })
 
