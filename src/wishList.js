@@ -69,7 +69,7 @@ class WishListError extends Error {
   }
 
   toJSON () {
-    return { type: this.constructor.name, message: this.message, explanation: this.explanation || { _error: this.message } }
+    return { name: this.constructor.name, message: this.message, explanation: this.explanation || { _error: this.message } }
   }
 }
 

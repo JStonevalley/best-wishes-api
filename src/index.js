@@ -100,10 +100,9 @@ app.post('/wish-list', async (req, res) => {
   }
 })
 
-app.put('/wish-list/share', async (req, res) => {
-  const { id, sharedTo } = req.body
+app.put('/wish-list/share/:id', async ({ params: { id }, body: { sharedTo } }, res) => {
   try {
-    res.json(wishListDb.shareWishList(id, sharedTo))
+    res.json(await wishListDb.shareWishList(id, sharedTo))
   } catch (error) {
     res.status(400).json(error)
   }
