@@ -73,7 +73,7 @@ class WishError extends Error {
   }
 
   toJSON () {
-    return { name: this.constructor.name, message: this.message, explanation: this.explanation || { _error: this.message } }
+    return { name: this.constructor.name, message: this.message, explanation: this.explanation || { error: this.message } }
   }
 }
 

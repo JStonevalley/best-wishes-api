@@ -4,7 +4,9 @@ const WishDB = require('./wish')
 
 const WISH_LIST_TABLE = process.env.WISH_LIST_TABLE
 
-const sharedToValidator = yup.array().of(yup.string().email())
+const sharedToValidator = yup.object().shape({
+  sharedTo: yup.array().of(yup.string().email())
+})
 
 const wishListCreationValidation = yup.object().shape({
   id: yup.string().notRequired(),
@@ -46,7 +48,7 @@ class WishListDB {
   }
 
   async shareWishList (id, sharedTo) {
-    sharedToValidator.validateSync(sharedTo)
+    sharedToValidator.validateSync({ sharedTo })
     try {
       const conn = await this.cp
       const { first_error: firstError, skipped } = await r.table(WISH_LIST_TABLE).get(id).update({ sharedTo }).run(conn)
@@ -69,7 +71,7 @@ class WishListError extends Error {
   }
 
   toJSON () {
-    return { name: this.constructor.name, message: this.message, explanation: this.explanation || { _error: this.message } }
+    return { name: this.constructor.name, message: this.message, explanation: this.explanation || { error: this.message } }
   }
 }
 
