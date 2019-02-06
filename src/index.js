@@ -83,9 +83,9 @@ app.post('/user', async (req, res) => {
   }
 })
 
-app.get('/wish-list', async ({ query: { email, withWishes } }, res) => {
+app.get('/wish-list', async ({ query: { email, withWishes, withShares } }, res) => {
   try {
-    res.json(await wishListDb.getWishListsForOwner(email, withWishes))
+    res.json(await wishListDb.getWishListsForOwner({ email, withWishes, withShares }))
   } catch (error) {
     res.status(400).json(error)
   }
