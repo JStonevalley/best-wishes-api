@@ -59,9 +59,18 @@ class WishListDB {
     }
   }
 
+  async removeShares (shares) {
+    const conn = await this.cp
+    return Promise.all(shares.map((id) => r.table(WISH_LIST_SHARE_TABLE).get(id).delete().run(conn)))
+  }
+
   async shareWishList (id, sharedTo) {
     sharedToValidator.validateSync({ sharedTo })
     try {
+      const previousShares = await this.getWishListShares(id)
+      await this.removeShares(previousShares
+        .filter((share) => !sharedTo.includes(share.sharedTo))
+        .map((share) => share.id))
       return Promise.all(sharedTo.map((email) => this.saveWishListShare({ sharedTo: email, wishList: id })))
     } catch (error) {
       console.error(error)
