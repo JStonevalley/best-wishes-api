@@ -11,6 +11,9 @@ const yup = require('yup')
 
 const app = express()
 app.use(bodyParser.json())
+const privateRoute = express.Router()
+privateRoute.use(require('./auth'))
+app.use('/private', privateRoute)
 
 const connectionP = (process.env.IS_OFFLINE === 'true'
   ? r.connect({ host: 'localhost', port: 28015 })
@@ -41,7 +44,7 @@ const userValidation = yup.object().shape({
 
 const USER_TABLE = process.env.USER_TABLE
 
-app.get('/user/:email', async ({ params: { email } }, res) => {
+privateRoute.get('/user/:email', async ({ params: { email } }, res) => {
   try {
     userValidation.validateSync({ email })
   } catch (error) {
