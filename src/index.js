@@ -86,16 +86,17 @@ app.post('/user', async (req, res) => {
   }
 })
 
-app.get('/wish-list', async ({ query: { email, withWishes, withShares } }, res) => {
+privateRoute.get('/wish-list', async ({ query: { withWishes, withShares } }, res) => {
   try {
-    res.json(await wishListDb.getWishListsForOwner({ email, withWishes, withShares }))
+    res.json(await wishListDb.getWishListsForOwner({ email: res.locals.user.email, withWishes, withShares }))
   } catch (error) {
     res.status(400).json(error)
   }
 })
 
-app.post('/wish-list', async (req, res) => {
+privateRoute.post('/wish-list', async (req, res) => {
   const wishList = req.body
+  wishList.owner = res.locals.user.email
   try {
     res.json(await wishListDb.createWishList(wishList))
   } catch (error) {
@@ -103,7 +104,7 @@ app.post('/wish-list', async (req, res) => {
   }
 })
 
-app.put('/wish-list/share/:id', async ({ params: { id }, body: { sharedTo } }, res) => {
+privateRoute.put('/wish-list/share/:id', async ({ params: { id }, body: { sharedTo } }, res) => {
   try {
     res.json(await wishListDb.shareWishList(id, sharedTo))
   } catch (error) {
@@ -111,7 +112,7 @@ app.put('/wish-list/share/:id', async ({ params: { id }, body: { sharedTo } }, r
   }
 })
 
-app.put('/wish', async (req, res) => {
+privateRoute.put('/wish', async (req, res) => {
   const wish = req.body
   if (!wish.id) delete wish.id
   try {
@@ -121,7 +122,7 @@ app.put('/wish', async (req, res) => {
   }
 })
 
-app.delete('/wish/:id', async ({ params: { id } }, res) => {
+privateRoute.delete('/wish/:id', async ({ params: { id } }, res) => {
   try {
     await wishDb.deleteWish(id)
     res.json({ id })
