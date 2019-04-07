@@ -32,7 +32,7 @@ const sendShareEmail = async ({ share, wishList }) => {
       Body: {
         Html: {
           Charset: 'UTF-8',
-          Data: `<h1>${wishList.title}</h1><p>This wishlist has been shared with you by ${wishList.owner}. You and all the other givers will be able to indicate to each other what you have bought. Hopefully this leads to stressfree gift shopping and no duplicates :) Make the best wishes come true through this link:</p><a href="http://localhost:3000/shares/wish-list/${share.id}">{wishList.title}</a>`
+          Data: `<h1>${wishList.title}</h1><p>This wishlist has been shared with you by ${wishList.owner}. You and all the other gift givers will be able to indicate to each other what you have bought. Hopefully this leads to stressfree gift shopping and no duplicates :) Make the best wishes come true through this link:</p><a href="http://localhost:3000/shares/wish-list/${share.id}">${wishList.title}</a>`
         }
       },
       Subject: {
