@@ -13,7 +13,7 @@ provider:
   name: aws
   runtime: nodejs8.10
   stage: ${opt:stage, 'local'}
-  region: eu-west-2
+  region: eu-west-1
   profile: best-wishes-api
   environment: ${file(./serverless.env.yml):${opt:stage, 'local'}}
 

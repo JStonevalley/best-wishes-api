@@ -26,10 +26,6 @@ const connectionP = (process.env.IS_OFFLINE === 'true'
 const wishDb = new WishDB(connectionP)
 const wishListDb = new WishListDB(connectionP)
 
-app.get('/', function (req, res) {
-  res.json({ message: `Hello ${process.env.ENV}!` })
-})
-
 app.post('/fetch-page-meta', async ({ body: { url } }, res) => {
   url = url + (url.includes('?') ? '&' : '?') + '_escaped_fragment_='
   const response = await fetch(url, { method: 'GET', mode: 'no-cors' })
@@ -38,52 +34,16 @@ app.post('/fetch-page-meta', async ({ body: { url } }, res) => {
   res.json(getMetadata(doc, url))
 })
 
-const userValidation = yup.object().shape({
-  email: yup.string().email().required()
+app.get('/share/:id', async ({ params: { id } }, res) => {
+  res.json(await wishListDb.getWishListFromShareId(id))
 })
 
-const USER_TABLE = process.env.USER_TABLE
-
-privateRoute.get('/user/:email', async ({ params: { email } }, res) => {
-  try {
-    userValidation.validateSync({ email })
-  } catch (error) {
-    res.status(400).json(error)
-    return
-  }
-  const conn = await connectionP
-  try {
-    const user = await r.table(USER_TABLE).get(email).run(conn)
-    user
-      ? res.json(user)
-      : res.status(404).json({ error: 'User not found' })
-  } catch (error) {
-    console.log(error)
-    res.status(400).json({ error: 'Could not get user' })
-  }
+app.put('/share/wish/grant', async ({ body: { shareId, wishId } }, res) => {
+  res.json(await wishListDb.grantWishInWishListShare({ shareId, wishId }))
 })
 
-app.post('/user', async (req, res) => {
-  const { email } = req.body
-  const newUser = {
-    email
-  }
-  try {
-    userValidation.validateSync(newUser)
-  } catch (error) {
-    res.status(400).json(error)
-    return
-  }
-  const conn = await connectionP
-  try {
-    const { first_error: firstError } = await r.table(USER_TABLE).insert(newUser).run(conn)
-    if (firstError && firstError.startsWith('Duplicate primary key')) throw new yup.ValidationError('User already exists', newUser, 'email')
-    if (firstError) throw new Error(firstError)
-    res.json(newUser)
-  } catch (error) {
-    console.error(error)
-    res.status(400).json({ error: 'Could not save user' })
-  }
+app.put('/share/wish/revoke', async ({ body: { shareId, wishId } }, res) => {
+  res.json(await wishListDb.revokeWishGrantInWishListShare({ shareId, wishId }))
 })
 
 privateRoute.get('/wish-list', async ({ query: { withWishes, withShares } }, res) => {

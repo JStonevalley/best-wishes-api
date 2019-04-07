@@ -2,6 +2,9 @@ const r = require('rethinkdb')
 const yup = require('yup')
 const WishDB = require('./wish')
 const { flatten } = require('lodash')
+var AWS = require('aws-sdk')
+var credentials = new AWS.SharedIniFileCredentials({ profile: 'best-wishes-api' })
+AWS.config.credentials = credentials
 
 const WISH_LIST_TABLE = process.env.WISH_LIST_TABLE
 const WISH_LIST_SHARE_TABLE = process.env.WISH_LIST_SHARE_TABLE
@@ -19,6 +22,33 @@ const wishListCreationValidation = yup.object().shape({
   title: yup.string().required(),
   owner: yup.string().email().required()
 })
+
+const sendShareEmail = async ({ share, wishList }) => {
+  const params = {
+    Destination: {
+      ToAddresses: [share.sharedTo]
+    },
+    Message: {
+      Body: {
+        Html: {
+          Charset: 'UTF-8',
+          Data: `<h1>${wishList.title}</h1><p>This wishlist has been shared with you by ${wishList.owner}. You and all the other givers will be able to indicate to each other what you have bought. Hopefully this leads to stressfree gift shopping and no duplicates :) Make the best wishes come true through this link:</p><a href="http://localhost:3000/shares/wish-list/${share.id}">{wishList.title}</a>`
+        }
+      },
+      Subject: {
+        Charset: 'UTF-8',
+        Data: `You are invited to a wishlist: ${wishList.title}`
+      }
+    },
+    Source: 'no-reply@transactional.bestwishes.io'
+  }
+  try {
+    const { MessageId } = await new AWS.SES({ apiVersion: '2010-12-01' }).sendEmail(params).promise()
+    console.log(MessageId)
+  } catch (error) {
+    console.error(error)
+  }
+}
 
 class WishListDB {
   constructor (connectionP) {
@@ -67,11 +97,15 @@ class WishListDB {
   async shareWishList (id, sharedTo) {
     sharedToValidator.validateSync({ sharedTo })
     try {
+      const conn = await this.cp
+      const wishList = await r.table(WISH_LIST_TABLE).get(id).run(conn)
       const previousShares = await this.getWishListShares(id)
       await this.removeShares(previousShares
         .filter((share) => !sharedTo.includes(share.sharedTo))
         .map((share) => share.id))
-      return Promise.all(sharedTo.map((email) => this.saveWishListShare({ sharedTo: email, wishList: id })))
+      const allShares = await Promise.all(sharedTo.map((email) => this.saveWishListShare({ sharedTo: email, wishList: id })))
+      Promise.all(allShares.filter(({ sharedTo }) => !previousShares.map(share => share.sharedTo).includes(sharedTo)).map(share => sendShareEmail({ share, wishList })))
+      return allShares
     } catch (error) {
       console.error(error)
       throw new WishListError(`Could not share wish list`)
@@ -83,7 +117,7 @@ class WishListDB {
       const conn = await this.cp
       const [share] = await (await r.table(WISH_LIST_SHARE_TABLE).filter({ sharedTo, wishList }).run(conn)).toArray()
       if (!share) {
-        const { first_error: firstError, generated_keys: generatedKeys, skipped } = await r.table(WISH_LIST_SHARE_TABLE).insert({ sharedTo, wishList }).run(conn)
+        const { first_error: firstError, generated_keys: generatedKeys, skipped } = await r.table(WISH_LIST_SHARE_TABLE).insert({ sharedTo, wishList, grantedWishes: [] }).run(conn)
         if (firstError) throw new Error(firstError)
         if (skipped) throw new Error('Skipped')
         return { id: generatedKeys[0], sharedTo, wishList }
@@ -93,6 +127,53 @@ class WishListDB {
     } catch (error) {
       console.error(error)
       throw new WishListError(`Could not save wish list share`)
+    }
+  }
+
+  async getWishListFromShareId (shareId) {
+    try {
+      const conn = await this.cp
+      const share = await r.table(WISH_LIST_SHARE_TABLE).get(shareId).run(conn)
+      const wishList = await r.table(WISH_LIST_TABLE).get(share.wishList).run(conn)
+      const shares = [share, ...await this.getWishListShares(wishList.id)]
+      const wishes = await this.wishDb.getWishesForWishList(wishList.id)
+      return { shares, wishList, wishes }
+    } catch (error) {
+      console.error(error)
+      throw new WishListError(`Could not get wish list share`)
+    }
+  }
+
+  async grantWishInWishListShare ({ shareId, wishId }) {
+    try {
+      const conn = await this.cp
+      let share = await r.table(WISH_LIST_SHARE_TABLE).get(shareId).run(conn)
+      if (!share.grantedWishes || !share.grantedWishes.includes(wishId)) {
+        if (!share.grantedWishes) share.grantedWishes = []
+        share.grantedWishes.push(wishId)
+        const { first_error: firstError } = await r.table(WISH_LIST_SHARE_TABLE).get(shareId).update(share).run(conn)
+        if (firstError) throw new Error(firstError)
+      }
+      return share
+    } catch (error) {
+      console.error(error)
+      throw new WishListError(`Could not grant wish`)
+    }
+  }
+
+  async revokeWishGrantInWishListShare ({ shareId, wishId }) {
+    try {
+      const conn = await this.cp
+      let share = await r.table(WISH_LIST_SHARE_TABLE).get(shareId).run(conn)
+      if (share.grantedWishes.includes(wishId)) {
+        share.grantedWishes = share.grantedWishes.filter((wish) => wish !== wishId)
+        const { first_error: firstError } = await r.table(WISH_LIST_SHARE_TABLE).get(shareId).update(share).run(conn)
+        if (firstError) throw new Error(firstError)
+      }
+      return share
+    } catch (error) {
+      console.error(error)
+      throw new WishListError(`Could not revoke wish`)
     }
   }
 }

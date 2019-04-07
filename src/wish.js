@@ -47,6 +47,10 @@ class WishDB {
     return (await r.table(WISH_TABLE).getAll(...wishListIds, { index: 'wishList' }).run(conn)).toArray()
   }
 
+  async getWishesForWishList (wishListId) {
+    return this.getWishesForWishLists([wishListId])
+  }
+
   async getWish (id) {
     const conn = await this.cp
     return r.table(WISH_TABLE).get(id).run(conn)
