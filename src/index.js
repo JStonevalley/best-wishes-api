@@ -7,7 +7,6 @@ const fetch = require('isomorphic-fetch')
 const r = require('rethinkdb')
 const WishDB = require('./wish')
 const WishListDB = require('./wishList')
-const yup = require('yup')
 
 const app = express()
 app.use(bodyParser.json())
