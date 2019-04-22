@@ -65,10 +65,9 @@ privateRoute.post('/wish-list', async (req, res) => {
   }
 })
 
-privateRoute.put('/wish-list/share/:id', async ({ params: { id }, body: { sharedTo }, headers: { host, ...rest } }, res) => {
-  console.log('Headers:', rest)
+privateRoute.put('/wish-list/share/:id', async ({ params: { id }, body: { sharedTo }, headers: { origin } }, res) => {
   try {
-    res.json(await wishListDb.shareWishList({ host, id, sharedTo }))
+    res.json(await wishListDb.shareWishList({ origin, id, sharedTo }))
   } catch (error) {
     res.status(400).json(error)
   }
