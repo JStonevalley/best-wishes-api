@@ -3,8 +3,8 @@ const yup = require('yup')
 const WishDB = require('./wish')
 const { flatten } = require('lodash')
 var AWS = require('aws-sdk')
-var credentials = new AWS.SharedIniFileCredentials({ profile: 'best-wishes-api' })
-AWS.config.credentials = credentials
+
+if (process.env.IS_OFFLINE) AWS.config.credentials = new AWS.SharedIniFileCredentials({ profile: 'best-wishes-api' })
 
 const WISH_LIST_TABLE = process.env.WISH_LIST_TABLE
 const WISH_LIST_SHARE_TABLE = process.env.WISH_LIST_SHARE_TABLE
