@@ -23,7 +23,7 @@ const wishListCreationValidation = yup.object().shape({
   owner: yup.string().email().required()
 })
 
-const sendShareEmail = async ({ share, wishList }) => {
+const sendShareEmail = async ({ host, share, wishList }) => {
   const params = {
     Destination: {
       ToAddresses: [process.env.IS_OFFLINE ? 'jonas.stendahl@outlook.com' : share.sharedTo]
@@ -32,7 +32,7 @@ const sendShareEmail = async ({ share, wishList }) => {
       Body: {
         Html: {
           Charset: 'UTF-8',
-          Data: `<h1>${wishList.title}</h1><p>This wish list has been shared with you by ${wishList.owner}. You and all the other gift givers will be able to indicate to each other what you have bought. Hopefully this leads to stressfree gift shopping and no duplicates :) Make the best wishes come true through this link:</p><a href="http://localhost:3000/shares/wish-list/${share.id}">${wishList.title}</a>`
+          Data: `<h1>${wishList.title}</h1><p>This wish list has been shared with you by ${wishList.owner}. You and all the other gift givers will be able to indicate to each other what you have bought. Hopefully this leads to stressfree gift shopping and no duplicates :) Make the best wishes come true through this link:</p><a href="${host}/shares/wish-list/${share.id}">${wishList.title}</a>`
         }
       },
       Subject: {
@@ -94,7 +94,7 @@ class WishListDB {
     return Promise.all(shares.map((id) => r.table(WISH_LIST_SHARE_TABLE).get(id).delete().run(conn)))
   }
 
-  async shareWishList (id, sharedTo) {
+  async shareWishList ({ host, id, sharedTo }) {
     sharedToValidator.validateSync({ sharedTo })
     try {
       const conn = await this.cp
@@ -104,7 +104,7 @@ class WishListDB {
         .filter((share) => !sharedTo.includes(share.sharedTo))
         .map((share) => share.id))
       const allShares = await Promise.all(sharedTo.map((email) => this.saveWishListShare({ sharedTo: email, wishList: id })))
-      Promise.all(allShares.filter(({ sharedTo }) => !previousShares.map(share => share.sharedTo).includes(sharedTo)).map(share => sendShareEmail({ share, wishList })))
+      Promise.all(allShares.filter(({ sharedTo }) => !previousShares.map(share => share.sharedTo).includes(sharedTo)).map(share => sendShareEmail({ host, share, wishList })))
       return allShares
     } catch (error) {
       console.error(error)
@@ -134,6 +134,7 @@ class WishListDB {
     try {
       const conn = await this.cp
       const share = await r.table(WISH_LIST_SHARE_TABLE).get(shareId).run(conn)
+      if (!share) throw new Error('No share with id:', shareId)
       const wishList = await r.table(WISH_LIST_TABLE).get(share.wishList).run(conn)
       const shares = [share, ...await this.getWishListShares(wishList.id)]
       const wishes = await this.wishDb.getWishesForWishList(wishList.id)
