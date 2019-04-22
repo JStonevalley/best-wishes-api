@@ -96,6 +96,7 @@ class WishListDB {
   }
 
   async shareWishList ({ origin, id, sharedTo }) {
+    console.log('shareWishList', { sharedTo })
     sharedToValidator.validateSync({ sharedTo })
     try {
       const conn = await this.cp
@@ -105,9 +106,12 @@ class WishListDB {
         .filter((share) => !sharedTo.includes(share.sharedTo))
         .map((share) => share.id)
       await this.removeShares(shareIdsToRemove)
-      const allShares = await Promise.all(sharedTo.map((email) => this.saveWishListShare({ sharedTo: email, wishList: id })))
-      Promise.all(allShares.filter(({ sharedTo }) => !previousShares.map(share => share.sharedTo).includes(sharedTo)).map(share => sendShareEmail({ origin, share, wishList })))
-      return { shares: allShares, removedShares: shareIdsToRemove }
+      const sharesToAdd = sharedTo
+        .filter(email => !previousShares.find(share => share.sharedTo === email))
+      console.log('shareWishList', { sharesToAdd, shareIdsToRemove, previousShares })
+      const sharesAdded = await Promise.all(sharesToAdd.map((email) => this.saveWishListShare({ sharedTo: email, wishList: id })))
+      Promise.all(sharesAdded.map(share => sendShareEmail({ origin, share, wishList })))
+      return { shares: [...sharesAdded, ...previousShares], removedShares: shareIdsToRemove }
     } catch (error) {
       console.error(error)
       throw new WishListError(`Could not share wish list`)
