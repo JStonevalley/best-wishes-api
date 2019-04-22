@@ -12,7 +12,7 @@ const WishListDB = require('./wishList')
 const app = express()
 
 app.use(cors({
-  origin: 'http://bestwishes.io',
+  origin: 'https://bestwishes.io',
   optionsSuccessStatus: 204 // Using 200 will increase compability. Some legacy browsers (IE11, various SmartTVs) choke on 204
 }))
 
