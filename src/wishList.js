@@ -110,7 +110,7 @@ class WishListDB {
         .filter(email => !previousShares.find(share => share.sharedTo === email))
       console.log('shareWishList', { sharesToAdd, shareIdsToRemove, previousShares })
       const sharesAdded = await Promise.all(sharesToAdd.map((email) => this.saveWishListShare({ sharedTo: email, wishList: id })))
-      Promise.all(sharesAdded.map(share => sendShareEmail({ origin, share, wishList })))
+      await Promise.all(sharesAdded.map(share => sendShareEmail({ origin, share, wishList })))
       return { shares: [...sharesAdded, ...previousShares], removedShares: shareIdsToRemove }
     } catch (error) {
       console.error(error)
