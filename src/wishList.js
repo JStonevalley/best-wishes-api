@@ -26,7 +26,7 @@ const wishListCreationValidation = yup.object().shape({
 const sendShareEmail = async ({ share, wishList }) => {
   const params = {
     Destination: {
-      ToAddresses: [share.sharedTo]
+      ToAddresses: [process.env.IS_OFFLINE ? 'jonas.stendahl@outlook.com' : share.sharedTo]
     },
     Message: {
       Body: {
