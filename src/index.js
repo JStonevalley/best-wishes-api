@@ -22,11 +22,7 @@ const privateRoute = express.Router()
 privateRoute.use(require('./auth'))
 app.use('/private', privateRoute)
 
-const connectionP = r.connect({ host: process.env.DATABASE_HOST, port: 28015, password: process.env.DATABASE_PASSWORD })
-  .then(async (conn) => {
-    await conn.use(process.env.ENV)
-    return conn
-  })
+const connectionP = r.connect({ host: process.env.DATABASE_HOST, port: 28015, password: process.env.DATABASE_PASSWORD, db: 'bestWishes' })
 
 const wishDb = new WishDB(connectionP)
 const wishListDb = new WishListDB(connectionP)
