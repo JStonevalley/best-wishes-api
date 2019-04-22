@@ -24,9 +24,10 @@ const wishListCreationValidation = yup.object().shape({
 })
 
 const sendShareEmail = async ({ origin, share, wishList }) => {
+  const email = process.env.IS_OFFLINE ? 'jonas.stendahl@outlook.com' : share.sharedTo
   const params = {
     Destination: {
-      ToAddresses: [process.env.IS_OFFLINE ? 'jonas.stendahl@outlook.com' : share.sharedTo]
+      ToAddresses: [email]
     },
     Message: {
       Body: {
@@ -44,7 +45,7 @@ const sendShareEmail = async ({ origin, share, wishList }) => {
   }
   try {
     const { MessageId } = await new AWS.SES({ apiVersion: '2010-12-01' }).sendEmail(params).promise()
-    console.log(MessageId)
+    console.log('Email sent:', { MessageId, email })
   } catch (error) {
     console.error(error)
   }
@@ -100,12 +101,13 @@ class WishListDB {
       const conn = await this.cp
       const wishList = await r.table(WISH_LIST_TABLE).get(id).run(conn)
       const previousShares = await this.getWishListShares(id)
-      await this.removeShares(previousShares
+      const shareIdsToRemove = previousShares
         .filter((share) => !sharedTo.includes(share.sharedTo))
-        .map((share) => share.id))
+        .map((share) => share.id)
+      await this.removeShares(shareIdsToRemove)
       const allShares = await Promise.all(sharedTo.map((email) => this.saveWishListShare({ sharedTo: email, wishList: id })))
       Promise.all(allShares.filter(({ sharedTo }) => !previousShares.map(share => share.sharedTo).includes(sharedTo)).map(share => sendShareEmail({ origin, share, wishList })))
-      return allShares
+      return { shares: allShares, removedShares: shareIdsToRemove }
     } catch (error) {
       console.error(error)
       throw new WishListError(`Could not share wish list`)
