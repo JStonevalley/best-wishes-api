@@ -1,6 +1,7 @@
 const serverless = require('serverless-http')
 const express = require('express')
 const bodyParser = require('body-parser')
+const cors = require('cors')
 const { getMetadata } = require('page-metadata-parser')
 const domino = require('domino')
 const fetch = require('isomorphic-fetch')
@@ -9,18 +10,23 @@ const WishDB = require('./wish')
 const WishListDB = require('./wishList')
 
 const app = express()
+
+app.use(cors({
+  origin: 'http://bestwishes.io',
+  optionsSuccessStatus: 204 // Using 200 will increase compability. Some legacy browsers (IE11, various SmartTVs) choke on 204
+}))
+
 app.use(bodyParser.json())
+
 const privateRoute = express.Router()
 privateRoute.use(require('./auth'))
 app.use('/private', privateRoute)
 
-const connectionP = (process.env.IS_OFFLINE === 'true'
-  ? r.connect({ host: 'localhost', port: 28015 })
-  : r.connect({ host: 'localhost', port: 28015 })
-).then(async (conn) => {
-  await conn.use(process.env.ENV)
-  return conn
-})
+const connectionP = r.connect({ host: process.env.DATABASE_HOST, port: 28015, password: process.env.DATABASE_PASSWORD })
+  .then(async (conn) => {
+    await conn.use(process.env.ENV)
+    return conn
+  })
 
 const wishDb = new WishDB(connectionP)
 const wishListDb = new WishListDB(connectionP)

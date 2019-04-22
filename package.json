@@ -7,6 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "local": "serverless offline start --stage local",
     "deploy": "serverless deploy --stage prod",
+    "remove": "serverless remove --stage prod",
     "provision-db": "node provisionRethinkDb.js"
   },
   "keywords": [],
@@ -16,6 +17,7 @@
     "aws-sdk": "^2.355.0",
     "body-parser": "^1.18.3",
     "cognito-express": "^2.0.14",
+    "cors": "^2.8.5",
     "domino": "^2.1.0",
     "express": "^4.16.4",
     "isomorphic-fetch": "^2.2.1",
