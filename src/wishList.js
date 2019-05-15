@@ -95,8 +95,21 @@ class WishListDB {
     return Promise.all(shares.map((id) => r.table(WISH_LIST_SHARE_TABLE).get(id).delete().run(conn)))
   }
 
+  async resendShareEmail ({ origin, wishListId, email }) {
+    try {
+      const conn = await this.cp
+      const wishList = await r.table(WISH_LIST_TABLE).get(wishListId).run(conn)
+      const previousShares = await this.getWishListShares(wishListId)
+      const share = previousShares.find((share) => email === share.sharedTo)
+      if (!share) throw new WishListError('Not currently shared to that email')
+      await sendShareEmail({ origin, share, wishList })
+    } catch (error) {
+      console.error(error)
+      throw new WishListError(`Could not resend email`)
+    }
+  }
+
   async shareWishList ({ origin, id, sharedTo }) {
-    console.log('shareWishList', { sharedTo })
     sharedToValidator.validateSync({ sharedTo })
     try {
       const conn = await this.cp

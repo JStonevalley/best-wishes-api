@@ -73,6 +73,15 @@ privateRoute.put('/wish-list/share/:id', async ({ params: { id }, body: { shared
   }
 })
 
+privateRoute.post('/wish-list/share/resend/:wishListId', async ({ params: { wishListId }, body: { email }, headers: { origin } }, res) => {
+  try {
+    await wishListDb.resendShareEmail({ origin, wishListId, email })
+    res.send(true)
+  } catch (error) {
+    res.status(400).json(error)
+  }
+})
+
 privateRoute.put('/wish', async (req, res) => {
   const wish = req.body
   if (!wish.id) delete wish.id
