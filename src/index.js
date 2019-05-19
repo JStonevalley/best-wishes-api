@@ -70,6 +70,14 @@ privateRoute.post('/wish-list', async (req, res) => {
   }
 })
 
+privateRoute.delete('/wish-list/:wishListId', async ({ params: { wishListId } }, res) => {
+  try {
+    res.json(await wishListDb.removeWishList({ wishListId, owner: res.locals.user.email }))
+  } catch (error) {
+    res.status(400).json(error)
+  }
+})
+
 privateRoute.put('/wish-list/share/:id', async ({ params: { id }, body: { sharedTo }, headers: { origin } }, res) => {
   try {
     res.json(await wishListDb.shareWishList({ origin, id, sharedTo }))

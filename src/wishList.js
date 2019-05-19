@@ -51,6 +51,8 @@ const sendShareEmail = async ({ origin, share, wishList }) => {
   }
 }
 
+const wishListForOwnerFilter = (email) => (wishList) => wishList('owner').eq(email).and(wishList.hasFields('removedAt').not())
+
 class WishListDB {
   constructor (connectionP) {
     this.cp = connectionP
@@ -66,7 +68,7 @@ class WishListDB {
     userEmailValidation.validateSync({ email })
     try {
       const conn = await this.cp
-      const wishLists = await (await r.table(WISH_LIST_TABLE).filter({ owner: email }).run(conn)).toArray()
+      const wishLists = await (await r.table(WISH_LIST_TABLE).filter(wishListForOwnerFilter(email)).run(conn)).toArray()
       const wishes = withWishes ? await this.wishDb.getWishesForWishLists(wishLists.map((wishList) => wishList.id)) : []
       const shares = withShares ? flatten(await Promise.all(wishLists.map(({ id }) => this.getWishListShares(id)))).filter(Boolean) : []
       return { wishLists, wishes, shares }
@@ -87,6 +89,20 @@ class WishListDB {
     } catch (error) {
       console.error(error)
       throw new WishListError(`Could not save wish list`)
+    }
+  }
+
+  async removeWishList ({ wishListId, owner }) {
+    try {
+      const conn = await this.cp
+      const removedAt = new Date()
+      const wishList = await r.table(WISH_LIST_TABLE).get(wishListId).run(conn)
+      if (wishList.owner !== owner) throw new WishListError('Only owner can remove wish list.')
+      await r.table(WISH_LIST_TABLE).get(wishListId).update({ removedAt }).run(conn)
+      return { ...wishList, removedAt }
+    } catch (error) {
+      console.error(error)
+      throw new WishListError(`Could not remove wish list`)
     }
   }
 
@@ -155,12 +171,13 @@ class WishListDB {
       const share = await r.table(WISH_LIST_SHARE_TABLE).get(shareId).run(conn)
       if (!share) throw new Error('No share with id:', shareId)
       const wishList = await r.table(WISH_LIST_TABLE).get(share.wishList).run(conn)
+      if (wishList.removedAt) throw new WishListError('Wish list is removed by its creator.')
       const shares = [share, ...await this.getWishListShares(wishList.id)]
       const wishes = await this.wishDb.getWishesForWishList(wishList.id)
       return { shares, wishList, wishes }
     } catch (error) {
       console.error(error)
-      throw new WishListError(`Could not get wish list share`)
+      throw error instanceof WishListError ? error : new WishListError(`Could not get wish list share`)
     }
   }
 
