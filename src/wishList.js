@@ -1,6 +1,7 @@
 const r = require('rethinkdb')
 const yup = require('yup')
 const WishDB = require('./wish')
+const DBUtils = require('./dbUtils')
 const { flatten } = require('lodash')
 var AWS = require('aws-sdk')
 
@@ -57,6 +58,7 @@ class WishListDB {
   constructor (connectionP) {
     this.cp = connectionP
     this.wishDb = new WishDB(connectionP)
+    this.dbUtils = new DBUtils(connectionP)
   }
 
   async getWishListShares (wishList) {
@@ -96,8 +98,8 @@ class WishListDB {
     try {
       const conn = await this.cp
       const removedAt = new Date()
-      const wishList = await r.table(WISH_LIST_TABLE).get(wishListId).run(conn)
-      if (wishList.owner !== owner) throw new WishListError('Only owner can remove wish list.')
+      const wishList = await this.dbUtils.getWishListById({ wishListId, owner })
+      console.log(wishList)
       await r.table(WISH_LIST_TABLE).get(wishListId).update({ removedAt }).run(conn)
       return { ...wishList, removedAt }
     } catch (error) {
@@ -125,12 +127,11 @@ class WishListDB {
     }
   }
 
-  async shareWishList ({ origin, id, sharedTo }) {
+  async shareWishList ({ origin, wishListId, sharedTo, owner }) {
     sharedToValidator.validateSync({ sharedTo })
     try {
-      const conn = await this.cp
-      const wishList = await r.table(WISH_LIST_TABLE).get(id).run(conn)
-      const previousShares = await this.getWishListShares(id)
+      const wishList = await this.dbUtils.getWishListById({ wishListId, owner })
+      const previousShares = await this.getWishListShares(wishListId)
       const shareIdsToRemove = previousShares
         .filter((share) => !sharedTo.includes(share.sharedTo))
         .map((share) => share.id)
@@ -138,12 +139,12 @@ class WishListDB {
       const sharesToAdd = sharedTo
         .filter(email => !previousShares.find(share => share.sharedTo === email))
       console.log('shareWishList', { sharesToAdd, shareIdsToRemove, previousShares })
-      const sharesAdded = await Promise.all(sharesToAdd.map((email) => this.saveWishListShare({ sharedTo: email, wishList: id })))
+      const sharesAdded = await Promise.all(sharesToAdd.map((email) => this.saveWishListShare({ sharedTo: email, wishList: wishListId })))
       await Promise.all(sharesAdded.map(share => sendShareEmail({ origin, share, wishList })))
       return { shares: [...sharesAdded, ...previousShares], removedShares: shareIdsToRemove }
     } catch (error) {
       console.error(error)
-      throw new WishListError(`Could not share wish list`)
+      throw error instanceof WishListError ? error : new WishListError(`Could not get wish list share`)
     }
   }
 
