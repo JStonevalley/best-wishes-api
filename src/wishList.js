@@ -3,6 +3,7 @@ const yup = require('yup')
 const WishDB = require('./wish')
 const DBUtils = require('./dbUtils')
 const { flatten } = require('lodash')
+const { renderEmailTemplate } = require('./email/render')
 var AWS = require('aws-sdk')
 
 if (process.env.IS_OFFLINE) AWS.config.credentials = new AWS.SharedIniFileCredentials({ profile: 'best-wishes-api' })
@@ -34,7 +35,13 @@ const sendShareEmail = async ({ origin, share, wishList }) => {
       Body: {
         Html: {
           Charset: 'UTF-8',
-          Data: `<h1>${wishList.title}</h1><p>This wish list has been shared with you by ${wishList.owner}. You and all the other gift givers will be able to indicate to each other what you have bought. Hopefully this leads to stressfree gift shopping and no duplicates :) Make the best wishes come true through this link:</p><a href="${origin}/shares/wish-list/${share.id}">${wishList.title}</a>`
+          Data: renderEmailTemplate(
+            'wishListShare',
+            {
+              fromEmail: wishList.owner,
+              wishListLink: `${origin}/shares/wish-list/${share.id}`
+            }
+          ) // `<h1>${wishList.title}</h1><p>This wish list has been shared with you by ${wishList.owner}.  Make the best wishes come true through this link:</p><a href="${origin}/shares/wish-list/${share.id}">${wishList.title}</a>`
         }
       },
       Subject: {
