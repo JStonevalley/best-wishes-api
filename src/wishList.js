@@ -39,6 +39,7 @@ const sendShareEmail = async ({ origin, share, wishList }) => {
             'wishListShare',
             {
               fromEmail: wishList.owner,
+              wishListTitle: wishList.title,
               wishListLink: `${origin}/shares/wish-list/${share.id}`
             }
           ) // `<h1>${wishList.title}</h1><p>This wish list has been shared with you by ${wishList.owner}.  Make the best wishes come true through this link:</p><a href="${origin}/shares/wish-list/${share.id}">${wishList.title}</a>`
