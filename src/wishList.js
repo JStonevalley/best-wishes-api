@@ -49,7 +49,7 @@ const sendShareEmail = async ({ origin, share, wishList }) => {
         Data: `You are invited to a wish list: ${wishList.title}`
       }
     },
-    Source: 'no-reply@transactional.bestwishes.io'
+    Source: 'Bestwishes <no-reply@transactional.bestwishes.io>'
   }
   try {
     const { MessageId } = await new AWS.SES({ apiVersion: '2010-12-01' }).sendEmail(params).promise()
