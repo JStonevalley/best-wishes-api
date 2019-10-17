@@ -9,7 +9,7 @@ const r = require('rethinkdb')
 const WishDB = require('./wish')
 const WishListDB = require('./wishList')
 
-// Deploy 1
+// Deploy 2
 
 const app = express()
 
