@@ -9,7 +9,9 @@ const r = require('rethinkdb')
 const WishDB = require('./wish')
 const WishListDB = require('./wishList')
 
-// Deploy 2
+// Deploy 3
+
+const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms))
 
 const app = express()
 
@@ -21,7 +23,24 @@ const privateRoute = express.Router()
 privateRoute.use(require('./auth'))
 app.use('/private', privateRoute)
 
-const connectionP = r.connect({ host: process.env.DATABASE_HOST, port: 28015, password: process.env.DATABASE_PASSWORD, db: 'bestWishes' })
+const connectToDb = (retries) => {
+  r.connect({ host: process.env.DATABASE_HOST, port: 28015, password: process.env.DATABASE_PASSWORD, db: 'bestWishes' })
+    .then((connection) => {
+      console.log(`connectToDb ${process.env.DATABASE_HOST}:28015-bestWishes connected`)
+      return connection
+    })
+    .catch(async (error) => {
+      console.error('connectToDb', retries, error)
+      if (retries) {
+        await sleep(1000)
+        return connectToDb(retries - 1)
+      } else {
+        return Promise.reject(error)
+      }
+    })
+}
+
+const connectionP = connectToDb(5)
 
 const wishDb = new WishDB(connectionP)
 const wishListDb = new WishListDB(connectionP)
