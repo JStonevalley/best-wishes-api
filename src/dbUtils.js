@@ -26,6 +26,13 @@ class DBUtils {
     if (wishList.owner !== owner) throw new DBUtilsError('Only owner can get wish list.')
     return wishList
   }
+
+  async addNewWishIdToWishList ({ wishListId, wishId, owner }) {
+    const wishList = await this.getWishListById({ wishListId, owner })
+    wishList.wishIds = [ ...(wishList.wishIds || []), wishId ]
+    const conn = await this.cp
+    await r.table(WISH_LIST_TABLE).get(wishListId).update(wishList).run(conn)
+  }
 }
 
 module.exports = DBUtils

@@ -22,7 +22,8 @@ const userEmailValidation = yup.object().shape({
 const wishListCreationValidation = yup.object().shape({
   id: yup.string().notRequired(),
   title: yup.string().required(),
-  owner: yup.string().email().required()
+  owner: yup.string().email().required(),
+  wishIds: yup.array().of().string().notRequired()
 })
 
 const sendShareEmail = async ({ origin, share, wishList }) => {
@@ -90,6 +91,7 @@ class WishListDB {
 
   async createWishList (wishList) {
     wishListCreationValidation.validateSync(wishList)
+    wishList.wishIds = []
     try {
       const conn = await this.cp
       const { first_error: firstError, generated_keys: generatedKeys, skipped } = await r.table(WISH_LIST_TABLE).insert(wishList).run(conn)
@@ -107,12 +109,25 @@ class WishListDB {
       const conn = await this.cp
       const removedAt = new Date()
       const wishList = await this.dbUtils.getWishListById({ wishListId, owner })
-      console.log(wishList)
       await r.table(WISH_LIST_TABLE).get(wishListId).update({ removedAt }).run(conn)
       return { ...wishList, removedAt }
     } catch (error) {
       console.error(error)
       throw new WishListError(`Could not remove wish list`)
+    }
+  }
+
+  async reorderWishesInWishList ({ wishListId, owner, wishIds }) {
+    try {
+      const conn = await this.cp
+      const wishList = await this.dbUtils.getWishListById({ wishListId, owner })
+      const wishes = await this.wishDb.getWishesForWishList(wishListId)
+      if (wishIds.sort().join('') !== wishes.map((wish) => wish.id).sort().join('')) throw new WishListError('Cannot add or remove from wishIds')
+      wishList.wishIds = wishIds
+      await r.table(WISH_LIST_TABLE).get(wishListId).update(wishList).run(conn)
+    } catch (error) {
+      console.error(error)
+      throw new WishListError(`Could not reorder wishes`)
     }
   }
 

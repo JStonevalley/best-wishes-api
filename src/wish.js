@@ -33,6 +33,13 @@ class WishDB {
         ? await r.table(WISH_TABLE).get(id).update(wishContent).run(conn)
         : await r.table(WISH_TABLE).insert(wishContent).run(conn)
       if (firstError) throw new Error(firstError)
+      if (inserted) {
+        await this.dbUtils.addNewWishIdToWishList({
+          wishListId: wishContent.wishList,
+          wishId: generatedKeys[0],
+          owner
+        })
+      }
       return { id: inserted ? generatedKeys[0] : id, ...wishContent }
     } catch (error) {
       console.error(error)

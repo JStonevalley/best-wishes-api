@@ -133,6 +133,14 @@ privateRoute.delete('/wish/:wishId', async ({ params: { wishId } }, res) => {
   }
 })
 
+privateRoute.put('/wish-list/reorder/:wishListId', async ({ params: { wishListId }, body: { wishIds } }, res) => {
+  try {
+    res.json(await wishListDb.reorderWishesInWishList({ wishListId, wishIds, owner: res.locals.user.email }))
+  } catch (error) {
+    res.status(400).json(error)
+  }
+})
+
 module.exports = {
   handler: serverless(app)
 }
