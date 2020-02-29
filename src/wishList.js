@@ -23,7 +23,7 @@ const wishListCreationValidation = yup.object().shape({
   id: yup.string().notRequired(),
   title: yup.string().required(),
   owner: yup.string().email().required(),
-  wishIds: yup.array().of().string().notRequired()
+  wishIds: yup.array().of(yup.string()).notRequired()
 })
 
 const sendShareEmail = async ({ origin, share, wishList }) => {
