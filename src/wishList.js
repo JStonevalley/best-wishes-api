@@ -193,7 +193,7 @@ class WishListDB {
     try {
       const conn = await this.cp
       const share = await r.table(WISH_LIST_SHARE_TABLE).get(shareId).run(conn)
-      if (!share) throw new Error('No share with id:', shareId)
+      if (!share) throw new Error(`No share with id: ${shareId}`)
       const wishList = await r.table(WISH_LIST_TABLE).get(share.wishList).run(conn)
       if (wishList.removedAt) throw new WishListError('Wish list is removed by its creator.')
       const shares = [share, ...await this.getWishListShares(wishList.id)]
