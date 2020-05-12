@@ -60,6 +60,7 @@ app.post('/fetch-page-meta', async ({ body: { url } }, res) => {
 })
 
 app.get('/share/:id', async ({ params: { id } }, res) => {
+  console.log(`Try to fetch share with id: ${JSON.stringify({ id })}`)
   res.json(await wishListDb.getWishListFromShareId(id))
 })
 
