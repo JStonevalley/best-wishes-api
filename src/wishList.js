@@ -2,7 +2,6 @@ const r = require('rethinkdb')
 const yup = require('yup')
 const WishDB = require('./wish')
 const DBUtils = require('./dbUtils')
-const { flatten } = require('lodash')
 const { renderEmailTemplate } = require('./email/render')
 var AWS = require('aws-sdk')
 
@@ -81,7 +80,7 @@ class WishListDB {
       const conn = await this.cp
       const wishLists = await (await r.table(WISH_LIST_TABLE).filter(wishListForOwnerFilter(email)).run(conn)).toArray()
       const wishes = withWishes ? await this.wishDb.getWishesForWishLists(wishLists.map((wishList) => wishList.id)) : []
-      const shares = withShares ? flatten(await Promise.all(wishLists.map(({ id }) => this.getWishListShares(id)))).filter(Boolean) : []
+      const shares = withShares ? (await Promise.all(wishLists.map(({ id }) => this.getWishListShares(id)))).flat().filter(Boolean) : []
       return { wishLists, wishes, shares }
     } catch (error) {
       console.error(error)
