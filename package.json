@@ -14,7 +14,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "aws-sdk": "^2.518.0",
     "body-parser": "^1.18.3",
     "cognito-express": "^2.0.14",
     "cors": "^2.8.5",
@@ -30,6 +29,7 @@
     "yup": "^0.26.10"
   },
   "devDependencies": {
+    "aws-sdk": "^2.631.0",
     "serverless-offline": "^6.1.5",
     "standard": "^12.0.1"
   }
