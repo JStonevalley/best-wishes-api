@@ -9,7 +9,7 @@ const r = require('rethinkdb')
 const WishDB = require('./wish')
 const WishListDB = require('./wishList')
 
-// Deploy 5
+// Deploy 6
 
 const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms))
 
