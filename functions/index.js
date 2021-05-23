@@ -1,8 +1,31 @@
 const functions = require('firebase-functions')
+const fetch = require('isomorphic-fetch')
+const domino = require('domino')
 const { getMetadata } = require('page-metadata-parser')
+const { json: jsonParser } = require('body-parser')
+const cors = require('cors')
+
+const combineMiddleware =
+  (...middlewares) =>
+  (func) => {
+    return [...middlewares, func].reduce((combination, middleware) => {
+      return function (req, res, next) {
+        combination(req, res, function (err) {
+          if (err) {
+            return next(err)
+          }
+          middleware(req, res, next)
+        })
+      }
+    })
+  }
 
 exports.fetchPageMetadata = functions.https.onRequest(
-  async ({ body: { url } }, res) => {
+  combineMiddleware(
+    cors(),
+    jsonParser()
+  )(async ({ body: { url } }, res) => {
+    if (!url) return res.json({})
     try {
       url = url + (url.includes('?') ? '&' : '?') + '_escaped_fragment_='
       const response = await fetch(url, { method: 'GET', mode: 'no-cors' })
@@ -13,5 +36,5 @@ exports.fetchPageMetadata = functions.https.onRequest(
       console.error(error)
       res.status(500).json(error)
     }
-  }
+  })
 )
