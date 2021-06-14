@@ -3,6 +3,7 @@
   "description": "Cloud Functions for Firebase project bestwishes",
   "scripts": {
     "lint": "eslint .",
+    "secure": "firebase deploy --only firestore:rules",
     "serve": "firebase emulators:start --only functions",
     "shell": "firebase functions:shell",
     "start": "npm run shell",
