@@ -15,6 +15,7 @@ service cloud.firestore {
       allow read: if resource.data.sharedByUID == request.auth.uid;
       allow update: if request.resource.data.sharedByUID == resource.data.sharedByUID && request.resource.data.list == resource.data.list && request.resource.data.invitedEmail == resource.data.invitedEmail;
       allow create: if request.resource.data.sharedByUID == request.auth.uid;
+      allow delete: if resource.data.sharedByUID == request.auth.uid;
     }
   }
 }
