@@ -4,6 +4,7 @@ const domino = require('domino')
 const { getMetadata } = require('page-metadata-parser')
 const { json: jsonParser } = require('body-parser')
 const cors = require('cors')
+const { assignShareByEmail } = require('./dbTriggers')
 
 const combineMiddleware =
   (...middlewares) =>
@@ -38,3 +39,5 @@ exports.fetchPageMetadata = functions.https.onRequest(
     }
   })
 )
+
+exports.assignShareByEmail = assignShareByEmail
