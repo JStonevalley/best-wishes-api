@@ -16,3 +16,5 @@ exports.assignShareByEmail = functions.firestore
       { merge: true }
     )
   })
+
+// TODO trigger above assignment on user creation.
