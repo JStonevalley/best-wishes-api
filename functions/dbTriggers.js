@@ -1,10 +1,7 @@
-const pMap = require('p-map')
-const functions = require('firebase-functions')
-const admin = require('firebase-admin')
+import pMap from 'p-map'
+import functions from 'firebase-functions'
+import admin from 'firebase-admin'
 admin.initializeApp()
-
-const auth = admin.getAuth()
-const db = admin.getFirestore()
 
 const querySnapshotToArrayOfDocs = (querySnapshot) => {
   const docs = []
@@ -12,18 +9,19 @@ const querySnapshotToArrayOfDocs = (querySnapshot) => {
   return docs
 }
 
-exports.associateCreatedShareByEmail = functions.firestore
+export const associateCreatedShareByEmail = functions.firestore
   .document('share/{shareId}')
   .onCreate(async (snap, context) => {
-    const userRecord = await auth.getUserByEmail(snap.data().email)
+    const userRecord = await admin.auth().getUserByEmail(snap.data().email)
     if (!userRecord) return null
     return snap.ref.update({ sharedWithUID: userRecord.uid })
   })
 
-exports.associateShareWithCreatedUserByEmail = functions.auth
+export const associateShareWithCreatedUserByEmail = functions.auth
   .user()
   .onCreate(async (userRecord) => {
-    const snapshot = await db
+    const snapshot = await admin
+      .getFirestore()
       .collection('share')
       .where('invitedEmail', '==', userRecord.email)
       .get()

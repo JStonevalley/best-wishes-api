@@ -1,13 +1,13 @@
-const functions = require('firebase-functions')
-const fetch = require('isomorphic-fetch')
-const domino = require('domino')
-const { getMetadata } = require('page-metadata-parser')
-const { json: jsonParser } = require('body-parser')
-const cors = require('cors')
-const {
+import functions from 'firebase-functions'
+import fetch from 'isomorphic-fetch'
+import domino from 'domino'
+import { getMetadata } from 'page-metadata-parser'
+import bodyParser from 'body-parser'
+import cors from 'cors'
+export {
   associateCreatedShareByEmail,
   associateShareWithCreatedUserByEmail
-} = require('./dbTriggers')
+} from './dbTriggers.js'
 
 const combineMiddleware =
   (...middlewares) =>
@@ -24,10 +24,10 @@ const combineMiddleware =
     })
   }
 
-exports.fetchPageMetadata = functions.https.onRequest(
+export const fetchPageMetadata = functions.https.onRequest(
   combineMiddleware(
     cors(),
-    jsonParser()
+    bodyParser.json()
   )(async ({ body: { url } }, res) => {
     if (!url) return res.json({})
     try {
@@ -42,8 +42,3 @@ exports.fetchPageMetadata = functions.https.onRequest(
     }
   })
 )
-
-exports.associateCreatedShareByEmail = associateCreatedShareByEmail
-
-exports.associateShareWithCreatedUserByEmail =
-  associateShareWithCreatedUserByEmail
