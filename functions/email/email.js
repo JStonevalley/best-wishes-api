@@ -1,7 +1,4 @@
 import functions from 'firebase-functions'
-import bodyParser from 'body-parser'
-import cors from 'cors'
-import { combineMiddleware } from '../expressTools.js'
 import mjml2html from 'mjml'
 import Handlebars from 'handlebars'
 import { readFile } from 'node:fs/promises'
@@ -15,16 +12,15 @@ export const renderEmailTemplate = (templateName) => async (context) => {
   return html
 }
 
-export const sendShareEmail = functions.https.onRequest(
-  combineMiddleware(
-    cors(),
-    bodyParser.json()
-  )(async ({ body: { shareIds = [] } }, res) => {
+export const sendShareEmail = functions.https.onCall(
+  async ({ shareId }, { auth }) => {
+    console.log(shareId)
+    console.log(auth)
     try {
-      res.json()
+      res.json({})
     } catch (error) {
       console.error(error)
       res.status(500).json(error)
     }
-  })
+  }
 )
