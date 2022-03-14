@@ -12,15 +12,8 @@ export const renderEmailTemplate = (templateName) => async (context) => {
   return html
 }
 
-export const sendShareEmail = functions.https.onCall(
-  async ({ shareId }, { auth }) => {
-    console.log(shareId)
-    console.log(auth)
-    try {
-      res.json({})
-    } catch (error) {
-      console.error(error)
-      res.status(500).json(error)
-    }
-  }
-)
+export const sendShareEmail = functions.https.onCall(async (data, { auth }) => {
+  console.log(data)
+  console.log(auth)
+  return data
+})
