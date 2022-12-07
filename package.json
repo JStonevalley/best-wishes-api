@@ -24,7 +24,7 @@
     "mjml": "^4.4.1",
     "page-metadata-parser": "^1.1.2",
     "rethinkdb": "^2.3.3",
-    "serverless": "^1.71.1",
+    "serverless": "^3.25.1",
     "serverless-http": "^2.3.0",
     "yup": "^0.26.10"
   },
