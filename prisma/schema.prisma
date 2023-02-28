@@ -6,49 +6,53 @@ generator client {
 }
 
 datasource db {
-  provider          = "postgresql"
-  url               = env("DATABASE_URL")
-  shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
 }
 
 model Wish {
-  id          String   @id @default(cuid())
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  title       String   @db.VarChar(255)
+  id          String       @id @default(auto()) @map("_id") @db.ObjectId
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  title       String
   description String?
-  price       Json?
-  quantity    Int      @default(1)
+  price       ValueObject?
+  quantity    Int          @default(1)
   link        String?
   image       String?
-  wishList    WishList @relation(fields: [wishListId], references: [id])
-  wishListId  String
+  WishList    WishList?    @relation(fields: [wishListId], references: [id])
+  wishListId  String?      @db.ObjectId
 }
 
 model Share {
-  id           String   @id @default(cuid())
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
   invitedEmail String
   wishList     WishList @relation(fields: [wishListId], references: [id])
-  wishListId   String
+  wishListId   String   @db.ObjectId
 }
 
 model WishList {
-  id        String   @id @default(cuid())
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  headline  String   @db.VarChar(255)
+  headline  String
   wishes    Wish[]
   shares    Share[]
   user      User     @relation(fields: [userId], references: [id])
-  userId    String
+  userId    String   @db.ObjectId
 }
 
 model User {
-  id        String     @id @default(cuid())
+  id        String     @id @default(auto()) @map("_id") @db.ObjectId
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
   email     String     @unique
   wishLists WishList[]
+}
+
+type ValueObject {
+  amount   Int
+  currency String
 }
