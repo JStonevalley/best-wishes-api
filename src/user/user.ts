@@ -1,31 +1,21 @@
 import { PrismaClient } from "@prisma/client";
-import { gql } from "apollo-server";
+import { User } from 'nexus-prisma'
+import { objectType } from 'nexus'
 
-export const userTypeDefs = gql`
-  type User {
-    id: String!
-    createdAt: DateTime!
-    updatedAt: DateTime!
-    email: String!
-    wishLists: [WishList]
-  }
+export const userTypes = [
+  objectType({
+    name: User.$name,
+    description: User.$description,
+    definition(t) {
+      t.field(User.id),
+        t.field(User.createdAt),
+        t.field(User.updatedAt),
+        t.field(User.email),
+        t.field(User.wishLists)
+    }
+  })
+]
 
-  input UserDetails {
-    email: String!
-  }
-
-  type Query {
-    userById(id: String!): User!
-  }
-
-  type Mutation {
-    createUser(userDetails: UserDetails!) : User!
-  }
-`
-
-type UserDetails = {
-  email: string
-}
 
 export const resolvers = (prisma: PrismaClient) => ({
   Query: {
@@ -38,9 +28,9 @@ export const resolvers = (prisma: PrismaClient) => ({
     }
   },
   Mutation: {
-    createUser: (_: any, { userDetails }: { userDetails: UserDetails }) => {
+    createUser: (_: any, { email }: { email: string }) => {
       return prisma.user.create({
-        data: userDetails
+        data: { email }
       })
     }
   }
