@@ -1,6 +1,5 @@
-import { PrismaClient } from "@prisma/client";
 import { User } from 'nexus-prisma'
-import { objectType } from 'nexus'
+import { objectType, queryField, stringArg, nonNull } from 'nexus'
 
 export const userTypes = [
   objectType({
@@ -10,28 +9,37 @@ export const userTypes = [
       t.field(User.id),
         t.field(User.createdAt),
         t.field(User.updatedAt),
-        t.field(User.email),
-        t.field(User.wishLists)
+        t.field(User.email)
     }
   })
 ]
 
-
-export const resolvers = (prisma: PrismaClient) => ({
-  Query: {
-    userById: (_: any, { id }: { id: string }) => {
-      return prisma.user.findUnique({
+export const userQueryFields = [
+  queryField('userById', {
+    type: User.$name,
+    args: {
+      id: nonNull(stringArg()),
+    },
+    resolve(_: any, { id }: { id: string }, context) {
+      return context.prisma.user.findUnique({
         where: {
           id
         }
       })
-    }
-  },
-  Mutation: {
-    createUser: (_: any, { email }: { email: string }) => {
-      return prisma.user.create({
+    },
+  })
+]
+
+export const userMutationFields = [
+  queryField('createUser', {
+    type: User.$name,
+    args: {
+      email: nonNull(stringArg()),
+    },
+    resolve(_: any, { email }: { email: string }, context) {
+      return context.prisma.user.create({
         data: { email }
       })
-    }
-  }
-});
+    },
+  })
+]
