@@ -1,5 +1,5 @@
 import { User } from 'nexus-prisma'
-import { objectType, queryField, stringArg, nonNull } from 'nexus'
+import { objectType, queryField, mutationField, stringArg, nonNull } from 'nexus'
 
 export const userTypes = [
   objectType({
@@ -20,8 +20,8 @@ export const userQueryFields = [
     args: {
       id: nonNull(stringArg()),
     },
-    resolve(_: any, { id }: { id: string }, context) {
-      return context.prisma.user.findUnique({
+    resolve(_: any, { id }: { id: string }, ctx) {
+      return ctx.prisma.user.findUnique({
         where: {
           id
         }
@@ -31,7 +31,7 @@ export const userQueryFields = [
 ]
 
 export const userMutationFields = [
-  queryField('createUser', {
+  mutationField('createUser', {
     type: User.$name,
     args: {
       email: nonNull(stringArg()),
