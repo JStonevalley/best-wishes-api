@@ -1,7 +1,7 @@
-import { makeSchema, asNexusMethod } from 'nexus';
-import { join } from 'path';
-import { userTypes, userQueryFields, userMutationFields } from './user/user';
-import { GraphQLDateTime } from 'graphql-scalars';
+import { makeSchema } from 'nexus'
+import { join } from 'path'
+import { userTypes, userQueryFields, userMutationFields } from './user/user'
+import { GraphQLDateTime } from 'graphql-scalars'
 
 export const schema = makeSchema({
   types: [GraphQLDateTime, ...userTypes, ...userQueryFields, ...userMutationFields],
@@ -10,7 +10,7 @@ export const schema = makeSchema({
     schema: join(__dirname, '..', 'schema.graphql'),
   },
   contextType: {
-    module: join(__dirname, "./context.ts"),
-    export: "Context",
+    module: join(__dirname, './context.ts'),
+    export: 'Context',
   },
 })

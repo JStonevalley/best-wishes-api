@@ -6,12 +6,9 @@ export const userTypes = [
     name: User.$name,
     description: User.$description,
     definition(t) {
-      t.field(User.id),
-        t.field(User.createdAt),
-        t.field(User.updatedAt),
-        t.field(User.email)
-    }
-  })
+      t.field(User.id), t.field(User.createdAt), t.field(User.updatedAt), t.field(User.email)
+    },
+  }),
 ]
 
 export const userQueryFields = [
@@ -23,11 +20,11 @@ export const userQueryFields = [
     resolve(_: any, { id }: { id: string }, ctx) {
       return ctx.prisma.user.findUnique({
         where: {
-          id
-        }
+          id,
+        },
       })
     },
-  })
+  }),
 ]
 
 export const userMutationFields = [
@@ -38,8 +35,8 @@ export const userMutationFields = [
     },
     resolve(_: any, { email }: { email: string }, context) {
       return context.prisma.user.create({
-        data: { email }
+        data: { email },
       })
     },
-  })
+  }),
 ]

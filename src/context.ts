@@ -5,5 +5,5 @@ export interface Context {
   prisma: PrismaClient
 }
 export const context = {
-  prisma
+  prisma,
 }
