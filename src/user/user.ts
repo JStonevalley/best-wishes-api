@@ -17,7 +17,7 @@ export const userQueryFields = [
     args: {
       id: nonNull(stringArg()),
     },
-    resolve(_: any, { id }: { id: string }, ctx) {
+    resolve(_, { id }: { id: string }, ctx) {
       return ctx.prisma.user.findUnique({
         where: {
           id,
@@ -33,7 +33,7 @@ export const userMutationFields = [
     args: {
       email: nonNull(stringArg()),
     },
-    resolve(_: any, { email }: { email: string }, context) {
+    resolve(_, { email }: { email: string }, context) {
       return context.prisma.user.create({
         data: { email },
       })
