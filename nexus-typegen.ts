@@ -37,6 +37,26 @@ export interface NexusGenObjects {
     id: string; // ID!
     updatedAt: NexusGenScalars['DateTime']; // DateTime!
   }
+  ValueObject: { // root type
+    amount?: number | null; // Int
+    currency?: string | null; // String
+  }
+  Wish: { // root type
+    createdAt: NexusGenScalars['DateTime']; // DateTime!
+    description?: string | null; // String
+    id: string; // ID!
+    image?: string | null; // String
+    link?: string | null; // String
+    quantity: number; // Int!
+    title: string; // String!
+    updatedAt: NexusGenScalars['DateTime']; // DateTime!
+  }
+  WishList: { // root type
+    createdAt: NexusGenScalars['DateTime']; // DateTime!
+    headline: string; // String!
+    id: string; // ID!
+    updatedAt: NexusGenScalars['DateTime']; // DateTime!
+  }
 }
 
 export interface NexusGenInterfaces {
@@ -62,6 +82,30 @@ export interface NexusGenFieldTypes {
     id: string; // ID!
     updatedAt: NexusGenScalars['DateTime']; // DateTime!
   }
+  ValueObject: { // field return type
+    amount: number | null; // Int
+    currency: string | null; // String
+  }
+  Wish: { // field return type
+    createdAt: NexusGenScalars['DateTime']; // DateTime!
+    description: string | null; // String
+    id: string; // ID!
+    image: string | null; // String
+    link: string | null; // String
+    price: NexusGenRootTypes['ValueObject'] | null; // ValueObject
+    quantity: number; // Int!
+    title: string; // String!
+    updatedAt: NexusGenScalars['DateTime']; // DateTime!
+    wishList: NexusGenRootTypes['WishList'] | null; // WishList
+  }
+  WishList: { // field return type
+    createdAt: NexusGenScalars['DateTime']; // DateTime!
+    headline: string; // String!
+    id: string; // ID!
+    updatedAt: NexusGenScalars['DateTime']; // DateTime!
+    user: NexusGenRootTypes['User']; // User!
+    wishes: NexusGenRootTypes['Wish'][]; // [Wish!]!
+  }
 }
 
 export interface NexusGenFieldTypeNames {
@@ -76,6 +120,30 @@ export interface NexusGenFieldTypeNames {
     email: 'String'
     id: 'ID'
     updatedAt: 'DateTime'
+  }
+  ValueObject: { // field return type name
+    amount: 'Int'
+    currency: 'String'
+  }
+  Wish: { // field return type name
+    createdAt: 'DateTime'
+    description: 'String'
+    id: 'ID'
+    image: 'String'
+    link: 'String'
+    price: 'ValueObject'
+    quantity: 'Int'
+    title: 'String'
+    updatedAt: 'DateTime'
+    wishList: 'WishList'
+  }
+  WishList: { // field return type name
+    createdAt: 'DateTime'
+    headline: 'String'
+    id: 'ID'
+    updatedAt: 'DateTime'
+    user: 'User'
+    wishes: 'Wish'
   }
 }
 

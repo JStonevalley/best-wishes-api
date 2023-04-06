@@ -24,7 +24,7 @@ model Wish {
   quantity    Int          @default(1)
   link        String?
   image       String?
-  WishList    WishList?    @relation(fields: [wishListId], references: [id])
+  wishList    WishList?    @relation(fields: [wishListId], references: [id])
   wishListId  String?      @db.ObjectId
 }
 

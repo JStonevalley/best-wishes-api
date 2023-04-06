@@ -1,10 +1,12 @@
 import { makeSchema } from 'nexus'
 import { join } from 'path'
 import { userTypes, userQueryFields, userMutationFields } from './user/user'
+import { wishTypes } from './wish/wish'
 import { GraphQLDateTime } from 'graphql-scalars'
+import { wishlistTypes } from './wishlist/wishlist'
 
 export const schema = makeSchema({
-  types: [GraphQLDateTime, ...userTypes, ...userQueryFields, ...userMutationFields],
+  types: [GraphQLDateTime, ...userTypes, ...userQueryFields, ...userMutationFields, ...wishTypes, ...wishlistTypes],
   outputs: {
     typegen: join(__dirname, '..', 'nexus-typegen.ts'),
     schema: join(__dirname, '..', 'schema.graphql'),

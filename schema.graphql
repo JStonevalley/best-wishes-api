@@ -21,3 +21,33 @@ type User {
   id: ID!
   updatedAt: DateTime!
 }
+
+type ValueObject {
+  """Amount in minor units"""
+  amount: Int
+
+  """Currency 3 letter identifier according to ISO 4217"""
+  currency: String
+}
+
+type Wish {
+  createdAt: DateTime!
+  description: String
+  id: ID!
+  image: String
+  link: String
+  price: ValueObject
+  quantity: Int!
+  title: String!
+  updatedAt: DateTime!
+  wishList: WishList
+}
+
+type WishList {
+  createdAt: DateTime!
+  headline: String!
+  id: ID!
+  updatedAt: DateTime!
+  user: User!
+  wishes: [Wish!]!
+}
