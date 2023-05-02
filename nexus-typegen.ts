@@ -31,6 +31,12 @@ export interface NexusGenScalars {
 export interface NexusGenObjects {
   Mutation: {};
   Query: {};
+  Share: { // root type
+    createdAt: NexusGenScalars['DateTime']; // DateTime!
+    id: string; // ID!
+    invitedEmail: string; // String!
+    updatedAt: NexusGenScalars['DateTime']; // DateTime!
+  }
   User: { // root type
     createdAt: NexusGenScalars['DateTime']; // DateTime!
     email: string; // String!
@@ -76,6 +82,13 @@ export interface NexusGenFieldTypes {
   Query: { // field return type
     userById: NexusGenRootTypes['User'] | null; // User
   }
+  Share: { // field return type
+    createdAt: NexusGenScalars['DateTime']; // DateTime!
+    id: string; // ID!
+    invitedEmail: string; // String!
+    updatedAt: NexusGenScalars['DateTime']; // DateTime!
+    wishList: NexusGenRootTypes['WishList']; // WishList!
+  }
   User: { // field return type
     createdAt: NexusGenScalars['DateTime']; // DateTime!
     email: string; // String!
@@ -102,6 +115,7 @@ export interface NexusGenFieldTypes {
     createdAt: NexusGenScalars['DateTime']; // DateTime!
     headline: string; // String!
     id: string; // ID!
+    shares: NexusGenRootTypes['Share'][]; // [Share!]!
     updatedAt: NexusGenScalars['DateTime']; // DateTime!
     user: NexusGenRootTypes['User']; // User!
     wishes: NexusGenRootTypes['Wish'][]; // [Wish!]!
@@ -114,6 +128,13 @@ export interface NexusGenFieldTypeNames {
   }
   Query: { // field return type name
     userById: 'User'
+  }
+  Share: { // field return type name
+    createdAt: 'DateTime'
+    id: 'ID'
+    invitedEmail: 'String'
+    updatedAt: 'DateTime'
+    wishList: 'WishList'
   }
   User: { // field return type name
     createdAt: 'DateTime'
@@ -141,6 +162,7 @@ export interface NexusGenFieldTypeNames {
     createdAt: 'DateTime'
     headline: 'String'
     id: 'ID'
+    shares: 'Share'
     updatedAt: 'DateTime'
     user: 'User'
     wishes: 'Wish'

@@ -15,6 +15,14 @@ type Query {
   userById(id: String!): User
 }
 
+type Share {
+  createdAt: DateTime!
+  id: ID!
+  invitedEmail: String!
+  updatedAt: DateTime!
+  wishList: WishList!
+}
+
 type User {
   createdAt: DateTime!
   email: String!
@@ -47,6 +55,7 @@ type WishList {
   createdAt: DateTime!
   headline: String!
   id: ID!
+  shares: [Share!]!
   updatedAt: DateTime!
   user: User!
   wishes: [Wish!]!
