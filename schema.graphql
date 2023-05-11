@@ -26,6 +26,7 @@ type Share {
 type User {
   createdAt: DateTime!
   email: String!
+  googleUserId: String!
   id: ID!
   updatedAt: DateTime!
 }

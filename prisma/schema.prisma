@@ -49,11 +49,12 @@ model WishList {
 }
 
 model User {
-  id        String     @id @default(auto()) @map("_id") @db.ObjectId
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
-  email     String     @unique
-  wishLists WishList[]
+  id           String     @id @default(auto()) @map("_id") @db.ObjectId
+  googleUserId String     @unique
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  email        String     @unique
+  wishLists    WishList[]
 }
 
 type ValueObject {

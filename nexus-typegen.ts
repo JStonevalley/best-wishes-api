@@ -40,6 +40,7 @@ export interface NexusGenObjects {
   User: { // root type
     createdAt: NexusGenScalars['DateTime']; // DateTime!
     email: string; // String!
+    googleUserId: string; // String!
     id: string; // ID!
     updatedAt: NexusGenScalars['DateTime']; // DateTime!
   }
@@ -92,6 +93,7 @@ export interface NexusGenFieldTypes {
   User: { // field return type
     createdAt: NexusGenScalars['DateTime']; // DateTime!
     email: string; // String!
+    googleUserId: string; // String!
     id: string; // ID!
     updatedAt: NexusGenScalars['DateTime']; // DateTime!
   }
@@ -139,6 +141,7 @@ export interface NexusGenFieldTypeNames {
   User: { // field return type name
     createdAt: 'DateTime'
     email: 'String'
+    googleUserId: 'String'
     id: 'ID'
     updatedAt: 'DateTime'
   }
