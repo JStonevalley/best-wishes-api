@@ -36,10 +36,11 @@ export const userMutationFields = [
     type: User.$name,
     args: {
       email: nonNull(stringArg()),
+      googleUserId: nonNull(stringArg()),
     },
-    resolve(_, { email }: { email: string }, ctx) {
+    resolve(_, { email, googleUserId }: { email: string; googleUserId: string }, ctx) {
       return ctx.prisma.user.create({
-        data: { email },
+        data: { email, googleUserId },
       })
     },
   }),
