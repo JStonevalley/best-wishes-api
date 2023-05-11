@@ -81,7 +81,7 @@ export interface NexusGenFieldTypes {
     createUser: NexusGenRootTypes['User'] | null; // User
   }
   Query: { // field return type
-    userById: NexusGenRootTypes['User'] | null; // User
+    getCurrentUser: NexusGenRootTypes['User'] | null; // User
   }
   Share: { // field return type
     createdAt: NexusGenScalars['DateTime']; // DateTime!
@@ -129,7 +129,7 @@ export interface NexusGenFieldTypeNames {
     createUser: 'User'
   }
   Query: { // field return type name
-    userById: 'User'
+    getCurrentUser: 'User'
   }
   Share: { // field return type name
     createdAt: 'DateTime'
@@ -177,11 +177,6 @@ export interface NexusGenArgTypes {
     createUser: { // args
       email: string; // String!
       googleUserId: string; // String!
-    }
-  }
-  Query: {
-    userById: { // args
-      id: string; // String!
     }
   }
 }

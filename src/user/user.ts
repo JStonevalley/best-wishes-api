@@ -16,17 +16,10 @@ export const userTypes = [
 ]
 
 export const userQueryFields = [
-  queryField('userById', {
+  queryField('getCurrentUser', {
     type: User.$name,
-    args: {
-      id: nonNull(stringArg()),
-    },
-    resolve(_, { id }: { id: string }, ctx) {
-      return ctx.prisma.user.findUnique({
-        where: {
-          id,
-        },
-      })
+    resolve(_, __, ctx) {
+      return ctx.user
     },
   }),
 ]

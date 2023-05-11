@@ -10,7 +10,7 @@ initializeApp({
 })
 export interface Context {
   prisma: PrismaClient
-  user?: User
+  user: User | null
 }
 export const setupContext = async ({ req }: any) => {
   const idToken = req.headers.authorization
@@ -18,6 +18,7 @@ export const setupContext = async ({ req }: any) => {
   if (!idToken) {
     return {
       prisma,
+      user: null,
     }
   }
   try {
@@ -27,7 +28,6 @@ export const setupContext = async ({ req }: any) => {
         googleUserId: decodedToken.uid,
       },
     })
-    logger.info(user)
     return {
       prisma,
       user,
@@ -36,6 +36,7 @@ export const setupContext = async ({ req }: any) => {
     logger.error(error)
     return {
       prisma,
+      user: null,
     }
   }
 }

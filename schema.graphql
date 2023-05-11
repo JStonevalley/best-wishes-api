@@ -12,7 +12,7 @@ type Mutation {
 }
 
 type Query {
-  userById(id: String!): User
+  getCurrentUser: User
 }
 
 type Share {
