@@ -1,29 +1,29 @@
-import { WishList, Share } from 'nexus-prisma'
+import { WishList as WishListSchemaTemplate, Share as ShareSchemaTemplate } from 'nexus-prisma'
 import { objectType } from 'nexus'
 
 export const wishlistTypes = [
   objectType({
-    name: WishList.$name,
-    description: WishList.$description,
+    name: WishListSchemaTemplate.$name,
+    description: WishListSchemaTemplate.$description,
     definition(t) {
-      t.field(WishList.id),
-        t.field(WishList.createdAt),
-        t.field(WishList.updatedAt),
-        t.field(WishList.headline),
-        t.field(WishList.user),
-        t.field(WishList.wishes),
-        t.field(WishList.shares)
+      t.field(WishListSchemaTemplate.id),
+        t.field(WishListSchemaTemplate.createdAt),
+        t.field(WishListSchemaTemplate.updatedAt),
+        t.field(WishListSchemaTemplate.headline),
+        t.field(WishListSchemaTemplate.user),
+        t.field(WishListSchemaTemplate.wishes),
+        t.field(WishListSchemaTemplate.shares)
     },
   }),
   objectType({
-    name: Share.$name,
-    description: Share.$description,
+    name: ShareSchemaTemplate.$name,
+    description: ShareSchemaTemplate.$description,
     definition(t) {
-      t.field(Share.id),
-        t.field(Share.createdAt),
-        t.field(Share.updatedAt),
-        t.field(Share.invitedEmail),
-        t.field(Share.wishList)
+      t.field(ShareSchemaTemplate.id),
+        t.field(ShareSchemaTemplate.createdAt),
+        t.field(ShareSchemaTemplate.updatedAt),
+        t.field(ShareSchemaTemplate.invitedEmail),
+        t.field(ShareSchemaTemplate.wishList)
     },
   }),
 ]

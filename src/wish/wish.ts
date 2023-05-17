@@ -1,4 +1,4 @@
-import { Wish } from 'nexus-prisma'
+import { Wish as WishSchemaTemplate } from 'nexus-prisma'
 import { objectType } from 'nexus'
 
 const ValueObject = objectType({
@@ -12,19 +12,19 @@ const ValueObject = objectType({
 export const wishTypes = [
   ValueObject,
   objectType({
-    name: Wish.$name,
-    description: Wish.$description,
+    name: WishSchemaTemplate.$name,
+    description: WishSchemaTemplate.$description,
     definition(t) {
-      t.field(Wish.id),
-        t.field(Wish.createdAt),
-        t.field(Wish.updatedAt),
-        t.field(Wish.title),
-        t.field(Wish.description),
-        t.field(Wish.price),
-        t.field(Wish.quantity),
-        t.field(Wish.link),
-        t.field(Wish.image),
-        t.field(Wish.wishList)
+      t.field(WishSchemaTemplate.id),
+        t.field(WishSchemaTemplate.createdAt),
+        t.field(WishSchemaTemplate.updatedAt),
+        t.field(WishSchemaTemplate.title),
+        t.field(WishSchemaTemplate.description),
+        t.field(WishSchemaTemplate.price),
+        t.field(WishSchemaTemplate.quantity),
+        t.field(WishSchemaTemplate.link),
+        t.field(WishSchemaTemplate.image),
+        t.field(WishSchemaTemplate.wishList)
     },
   }),
 ]
