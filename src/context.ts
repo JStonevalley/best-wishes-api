@@ -1,5 +1,4 @@
-import { PrismaClient } from '@prisma/client'
-import { User } from 'nexus-prisma'
+import { PrismaClient, User } from '@prisma/client'
 import { initializeApp, applicationDefault } from 'firebase-admin/app'
 import { getAuth } from 'firebase-admin/auth'
 import { logger } from './log'
@@ -14,7 +13,6 @@ export interface Context {
 }
 export const setupContext = async ({ req }: any) => {
   const idToken = req.headers.authorization
-  logger.info(`Id token ${idToken ? 'provided' : 'not provided'}`)
   if (!idToken) {
     return {
       prisma,
@@ -32,7 +30,7 @@ export const setupContext = async ({ req }: any) => {
       prisma,
       user,
     }
-  } catch (error) {
+  } catch (error: any) {
     logger.error(error)
     return {
       prisma,
