@@ -176,7 +176,6 @@ export interface NexusGenArgTypes {
   Mutation: {
     createUser: { // args
       email: string; // String!
-      googleUserId: string; // String!
     }
   }
 }

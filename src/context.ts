@@ -2,6 +2,7 @@ import { PrismaClient, User } from '@prisma/client'
 import { initializeApp, applicationDefault } from 'firebase-admin/app'
 import { getAuth } from 'firebase-admin/auth'
 import { logger } from './log'
+import { GraphQLError } from 'graphql'
 const prisma = new PrismaClient()
 initializeApp({
   credential: applicationDefault(),
@@ -10,6 +11,7 @@ initializeApp({
 export interface Context {
   prisma: PrismaClient
   user: User | null
+  googleUserId: string | null
 }
 export const setupContext = async ({ req }: any) => {
   const idToken = req.headers.authorization
@@ -17,24 +19,34 @@ export const setupContext = async ({ req }: any) => {
     return {
       prisma,
       user: null,
+      googleUserId: null,
     }
   }
   try {
-    const decodedToken = await getAuth().verifyIdToken(idToken)
+    const googleUserId = (await getAuth().verifyIdToken(idToken)).uid
     const user = await prisma.user.findUnique({
       where: {
-        googleUserId: decodedToken.uid,
+        googleUserId,
       },
     })
     return {
       prisma,
       user,
+      googleUserId,
     }
   } catch (error: any) {
-    logger.error(error)
-    return {
-      prisma,
-      user: null,
+    if (error.errorInfo?.code === 'auth/id-token-expired') {
+      logger.info('Throw GQL Error')
+      throw new GraphQLError(error.errorInfo?.message, {
+        extensions: { code: error.errorInfo?.code },
+      })
+    } else {
+      logger.error(error)
+      return {
+        prisma,
+        user: null,
+        googleUserId: null,
+      }
     }
   }
 }
