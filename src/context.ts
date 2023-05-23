@@ -2,7 +2,7 @@ import { PrismaClient, User } from '@prisma/client'
 import { initializeApp, applicationDefault } from 'firebase-admin/app'
 import { getAuth } from 'firebase-admin/auth'
 import { logger } from './log'
-import { GraphQLError } from 'graphql'
+
 const prisma = new PrismaClient()
 initializeApp({
   credential: applicationDefault(),
@@ -35,18 +35,11 @@ export const setupContext = async ({ req }: any) => {
       googleUserId,
     }
   } catch (error: any) {
-    if (error.errorInfo?.code === 'auth/id-token-expired') {
-      logger.info('Throw GQL Error')
-      throw new GraphQLError(error.errorInfo?.message, {
-        extensions: { code: error.errorInfo?.code },
-      })
-    } else {
-      logger.error(error)
-      return {
-        prisma,
-        user: null,
-        googleUserId: null,
-      }
+    logger.error(error)
+    return {
+      prisma,
+      user: null,
+      googleUserId: null,
     }
   }
 }

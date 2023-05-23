@@ -9,10 +9,13 @@ scalar DateTime
 
 type Mutation {
   createUser(email: String!): User
+  createWishList(headline: String!): WishList
 }
 
 type Query {
   getCurrentUser: User
+  getOwnWishList(id: String!): WishList
+  getOwnWishLists: [WishList]
 }
 
 type Share {

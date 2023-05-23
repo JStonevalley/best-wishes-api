@@ -79,9 +79,12 @@ export type NexusGenAllTypes = NexusGenRootTypes & NexusGenScalars
 export interface NexusGenFieldTypes {
   Mutation: { // field return type
     createUser: NexusGenRootTypes['User'] | null; // User
+    createWishList: NexusGenRootTypes['WishList'] | null; // WishList
   }
   Query: { // field return type
     getCurrentUser: NexusGenRootTypes['User'] | null; // User
+    getOwnWishList: NexusGenRootTypes['WishList'] | null; // WishList
+    getOwnWishLists: Array<NexusGenRootTypes['WishList'] | null> | null; // [WishList]
   }
   Share: { // field return type
     createdAt: NexusGenScalars['DateTime']; // DateTime!
@@ -127,9 +130,12 @@ export interface NexusGenFieldTypes {
 export interface NexusGenFieldTypeNames {
   Mutation: { // field return type name
     createUser: 'User'
+    createWishList: 'WishList'
   }
   Query: { // field return type name
     getCurrentUser: 'User'
+    getOwnWishList: 'WishList'
+    getOwnWishLists: 'WishList'
   }
   Share: { // field return type name
     createdAt: 'DateTime'
@@ -176,6 +182,14 @@ export interface NexusGenArgTypes {
   Mutation: {
     createUser: { // args
       email: string; // String!
+    }
+    createWishList: { // args
+      headline: string; // String!
+    }
+  }
+  Query: {
+    getOwnWishList: { // args
+      id: string; // String!
     }
   }
 }
