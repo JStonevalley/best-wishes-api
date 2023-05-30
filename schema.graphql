@@ -9,11 +9,13 @@ scalar DateTime
 
 type Mutation {
   createUser(email: String!): User
+  createWish(description: String, image: String, link: String, price: ValueObjectInput, quantity: Int, title: String!, wishListId: String!): Wish
   createWishList(headline: String!): WishList
 }
 
 type Query {
   getCurrentUser: User
+  getOwnWish(id: String!): Wish
   getOwnWishList(id: String!): WishList
   getOwnWishLists: [WishList]
 }
@@ -36,10 +38,18 @@ type User {
 
 type ValueObject {
   """Amount in minor units"""
-  amount: Int
+  amount: Int!
 
   """Currency 3 letter identifier according to ISO 4217"""
-  currency: String
+  currency: String!
+}
+
+input ValueObjectInput {
+  """Amount in minor units"""
+  amount: Int!
+
+  """Currency 3 letter identifier according to ISO 4217"""
+  currency: String!
 }
 
 type Wish {

@@ -5,6 +5,7 @@
 
 
 import type { Context } from "./src/context"
+import type { Wish } from "./node_modules/@prisma/client/index"
 
 
 
@@ -14,6 +15,10 @@ declare global {
 }
 
 export interface NexusGenInputs {
+  ValueObjectInput: { // input type
+    amount: number; // Int!
+    currency: string; // String!
+  }
 }
 
 export interface NexusGenEnums {
@@ -45,19 +50,10 @@ export interface NexusGenObjects {
     updatedAt: NexusGenScalars['DateTime']; // DateTime!
   }
   ValueObject: { // root type
-    amount?: number | null; // Int
-    currency?: string | null; // String
+    amount: number; // Int!
+    currency: string; // String!
   }
-  Wish: { // root type
-    createdAt: NexusGenScalars['DateTime']; // DateTime!
-    description?: string | null; // String
-    id: string; // ID!
-    image?: string | null; // String
-    link?: string | null; // String
-    quantity: number; // Int!
-    title: string; // String!
-    updatedAt: NexusGenScalars['DateTime']; // DateTime!
-  }
+  Wish: Wish;
   WishList: { // root type
     createdAt: NexusGenScalars['DateTime']; // DateTime!
     headline: string; // String!
@@ -79,10 +75,12 @@ export type NexusGenAllTypes = NexusGenRootTypes & NexusGenScalars
 export interface NexusGenFieldTypes {
   Mutation: { // field return type
     createUser: NexusGenRootTypes['User'] | null; // User
+    createWish: NexusGenRootTypes['Wish'] | null; // Wish
     createWishList: NexusGenRootTypes['WishList'] | null; // WishList
   }
   Query: { // field return type
     getCurrentUser: NexusGenRootTypes['User'] | null; // User
+    getOwnWish: NexusGenRootTypes['Wish'] | null; // Wish
     getOwnWishList: NexusGenRootTypes['WishList'] | null; // WishList
     getOwnWishLists: Array<NexusGenRootTypes['WishList'] | null> | null; // [WishList]
   }
@@ -101,8 +99,8 @@ export interface NexusGenFieldTypes {
     updatedAt: NexusGenScalars['DateTime']; // DateTime!
   }
   ValueObject: { // field return type
-    amount: number | null; // Int
-    currency: string | null; // String
+    amount: number; // Int!
+    currency: string; // String!
   }
   Wish: { // field return type
     createdAt: NexusGenScalars['DateTime']; // DateTime!
@@ -130,10 +128,12 @@ export interface NexusGenFieldTypes {
 export interface NexusGenFieldTypeNames {
   Mutation: { // field return type name
     createUser: 'User'
+    createWish: 'Wish'
     createWishList: 'WishList'
   }
   Query: { // field return type name
     getCurrentUser: 'User'
+    getOwnWish: 'Wish'
     getOwnWishList: 'WishList'
     getOwnWishLists: 'WishList'
   }
@@ -183,11 +183,23 @@ export interface NexusGenArgTypes {
     createUser: { // args
       email: string; // String!
     }
+    createWish: { // args
+      description?: string | null; // String
+      image?: string | null; // String
+      link?: string | null; // String
+      price?: NexusGenInputs['ValueObjectInput'] | null; // ValueObjectInput
+      quantity?: number | null; // Int
+      title: string; // String!
+      wishListId: string; // String!
+    }
     createWishList: { // args
       headline: string; // String!
     }
   }
   Query: {
+    getOwnWish: { // args
+      id: string; // String!
+    }
     getOwnWishList: { // args
       id: string; // String!
     }
@@ -202,7 +214,7 @@ export interface NexusGenTypeInterfaces {
 
 export type NexusGenObjectNames = keyof NexusGenObjects;
 
-export type NexusGenInputNames = never;
+export type NexusGenInputNames = keyof NexusGenInputs;
 
 export type NexusGenEnumNames = never;
 

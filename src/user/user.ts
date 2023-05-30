@@ -1,7 +1,7 @@
 import { User as UserSchemaTemplate } from 'nexus-prisma'
 import { objectType, queryField, mutationField, stringArg, nonNull } from 'nexus'
 import { GraphQLError } from 'graphql'
-import { logger } from '../log'
+import { logResolverInfo, requireAuth } from '../resolverTools'
 
 export const userTypes = [
   objectType({
@@ -20,14 +20,7 @@ export const userTypes = [
 export const userQueryFields = [
   queryField('getCurrentUser', {
     type: UserSchemaTemplate.$name,
-    resolve(_, __, ctx) {
-      logger.info('getCurrentUser')
-      if (!ctx.user)
-        throw new GraphQLError('Unauthenticated', {
-          extensions: { code: 'UNAUTHENTICATED' },
-        })
-      return ctx.user
-    },
+    resolve: logResolverInfo(requireAuth(async (_, __, ctx) => ctx.user)),
   }),
 ]
 
@@ -37,7 +30,7 @@ export const userMutationFields = [
     args: {
       email: nonNull(stringArg()),
     },
-    resolve(_, { email }: { email: string }, ctx) {
+    resolve: logResolverInfo((_, { email }: { email: string }, ctx) => {
       if (!ctx.googleUserId)
         throw new GraphQLError('Unauthenticated', {
           extensions: { code: 'UNAUTHENTICATED' },
@@ -45,6 +38,6 @@ export const userMutationFields = [
       return ctx.prisma.user.create({
         data: { email, googleUserId: ctx.googleUserId },
       })
-    },
+    }),
   }),
 ]

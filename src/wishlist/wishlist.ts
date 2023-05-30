@@ -1,7 +1,7 @@
 import { WishList as WishListSchemaTemplate, Share as ShareSchemaTemplate } from 'nexus-prisma'
 import { mutationField, nonNull, objectType, queryField, stringArg, list } from 'nexus'
-import { logger } from '../log'
 import { GraphQLError } from 'graphql'
+import { logResolverInfo, requireAuth } from '../resolverTools'
 
 export const wishlistTypes = [
   objectType({
@@ -33,36 +33,42 @@ export const wishlistTypes = [
 export const wishListQueryFields = [
   queryField('getOwnWishLists', {
     type: list(WishListSchemaTemplate.$name),
-    resolve(_, __, ctx) {
-      logger.info('getOwnWishLists')
-      if (!ctx.user)
-        throw new GraphQLError('Unauthenticated', {
-          extensions: { code: 'UNAUTHENTICATED' },
+    resolve: logResolverInfo(
+      requireAuth((_, __, ctx) => {
+        return ctx.prisma.wishList.findMany({
+          where: {
+            userId: ctx.user?.id,
+          },
         })
-      return ctx.prisma.wishList.findMany({
-        where: {
-          userId: ctx.user.id,
-        },
       })
-    },
+    ),
   }),
   queryField('getOwnWishList', {
     type: WishListSchemaTemplate.$name,
     args: {
       id: nonNull(stringArg()),
     },
-    resolve(_, { id }: { id: string }, ctx) {
-      logger.info('getOwnWishList')
-      if (!ctx.user)
-        throw new GraphQLError('Unauthenticated', {
-          extensions: { code: 'UNAUTHENTICATED' },
+    resolve: logResolverInfo(
+      requireAuth(async (_, { id }: { id: string }, ctx) => {
+        const wishList = await ctx.prisma.wishList.findUnique({
+          where: {
+            id,
+          },
+          include: {
+            wishes: true,
+          },
         })
-      return ctx.prisma.wishList.findUnique({
-        where: {
-          id,
-        },
+        if (!wishList)
+          throw new GraphQLError('WishList not found', {
+            extensions: { code: 'NOT_FOUND' },
+          })
+        if (ctx.user?.id !== wishList.userId)
+          throw new GraphQLError('This user is not the owner of the wish list', {
+            extensions: { code: 'FORBIDDEN' },
+          })
+        return wishList
       })
-    },
+    ),
   }),
 ]
 
@@ -72,14 +78,16 @@ export const wishListMutationFields = [
     args: {
       headline: nonNull(stringArg()),
     },
-    resolve(_, { headline }: { headline: string }, ctx) {
-      if (!ctx.user)
-        throw new GraphQLError('Unauthenticated', {
-          extensions: { code: 'UNAUTHENTICATED' },
+    resolve: logResolverInfo(
+      requireAuth((_, { headline }: { headline: string }, ctx) => {
+        if (!ctx.user)
+          throw new GraphQLError('Unauthenticated', {
+            extensions: { code: 'UNAUTHENTICATED' },
+          })
+        return ctx.prisma.wishList.create({
+          data: { headline, userId: ctx.user?.id },
         })
-      return ctx.prisma.wishList.create({
-        data: { headline, userId: ctx.user.id },
       })
-    },
+    ),
   }),
 ]
