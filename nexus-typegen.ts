@@ -74,6 +74,7 @@ export type NexusGenAllTypes = NexusGenRootTypes & NexusGenScalars
 
 export interface NexusGenFieldTypes {
   Mutation: { // field return type
+    changeWish: NexusGenRootTypes['Wish'] | null; // Wish
     createUser: NexusGenRootTypes['User'] | null; // User
     createWish: NexusGenRootTypes['Wish'] | null; // Wish
     createWishList: NexusGenRootTypes['WishList'] | null; // WishList
@@ -127,6 +128,7 @@ export interface NexusGenFieldTypes {
 
 export interface NexusGenFieldTypeNames {
   Mutation: { // field return type name
+    changeWish: 'Wish'
     createUser: 'User'
     createWish: 'Wish'
     createWishList: 'WishList'
@@ -180,6 +182,16 @@ export interface NexusGenFieldTypeNames {
 
 export interface NexusGenArgTypes {
   Mutation: {
+    changeWish: { // args
+      description?: string | null; // String
+      id: string; // String!
+      image?: string | null; // String
+      link?: string | null; // String
+      price?: NexusGenInputs['ValueObjectInput'] | null; // ValueObjectInput
+      quantity?: number | null; // Int
+      title: string; // String!
+      wishListId: string; // String!
+    }
     createUser: { // args
       email: string; // String!
     }

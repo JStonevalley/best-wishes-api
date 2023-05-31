@@ -119,4 +119,55 @@ export const wishMutationFields = [
       })
     ),
   }),
+  mutationField('changeWish', {
+    type: WishSchemaTemplate.$name,
+    args: {
+      id: nonNull(stringArg()),
+      link: stringArg(),
+      title: nonNull(stringArg()),
+      description: stringArg(),
+      price: ValueObjectInput,
+      image: stringArg(),
+      quantity: intArg(),
+      wishListId: nonNull(stringArg()),
+    },
+    resolve: logResolverInfo(
+      requireAuth(async (_, { id, link, title, description, image, quantity, wishListId, price }, ctx) => {
+        const wish = await ctx.prisma.wish.findUnique({
+          where: {
+            id,
+          },
+          select: {
+            wishList: {
+              select: {
+                userId: true,
+              },
+            },
+          },
+        })
+        if (!wish)
+          throw new GraphQLError('WishList not found', {
+            extensions: { code: 'NOT_FOUND' },
+          })
+        if (ctx.user?.id !== wish.wishList?.userId)
+          throw new GraphQLError('This user is not the owner of the wish', {
+            extensions: { code: 'FORBIDDEN' },
+          })
+        return ctx.prisma.wish.update({
+          where: {
+            id,
+          },
+          data: {
+            link,
+            title,
+            description,
+            image,
+            quantity: quantity || 1,
+            wishListId,
+            price,
+          },
+        })
+      })
+    ),
+  }),
 ]
