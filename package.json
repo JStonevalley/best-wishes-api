@@ -5,9 +5,9 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "local": "serverless offline start --stage local",
-    "deploy": "serverless deploy --stage prod",
-    "remove": "serverless remove --stage prod",
+    "local": "serverless offline start --aws-profile best-wishes-resources --stage local",
+    "deploy": "serverless deploy --aws-profile best-wishes-resources --stage prod",
+    "remove": "serverless remove --aws-profile best-wishes-resources --stage prod",
     "provision-db": "node provisionRethinkDb.js"
   },
   "keywords": [],
