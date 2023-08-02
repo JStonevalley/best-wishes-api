@@ -9,7 +9,7 @@ custom:
 
 provider:
   name: aws
-  runtime: nodejs16.x
+  runtime: nodejs14.x
   stage: ${opt:stage, 'local'}
   region: eu-west-1
   profile: best-wishes-resources
