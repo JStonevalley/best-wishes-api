@@ -9,10 +9,10 @@ custom:
 
 provider:
   name: aws
-  runtime: nodejs12.x
+  runtime: nodejs16.x
   stage: ${opt:stage, 'local'}
   region: eu-west-1
-  profile: best-wishes-api
+  profile: best-wishes-resources
   environment: ${file(./serverless.env.yml):${opt:stage, 'local'}}
 
 functions:
