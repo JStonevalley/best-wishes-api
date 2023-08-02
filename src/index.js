@@ -24,7 +24,7 @@ privateRoute.use(require('./auth'))
 app.use('/private', privateRoute)
 
 const connectToDb = (retriesAvailable, retries = 1) => {
-  console.log('connectToDb Starting connection attempt:', retries)
+  console.log(`connectToDb Starting connection attempt to ${process.env.DATABASE_HOST}:28015-bestWishes:`, retries)
   return r.connect({ host: process.env.DATABASE_HOST, port: 28015, password: process.env.DATABASE_PASSWORD, db: 'bestWishes' })
     .then((connection) => {
       console.log(`connectToDb ${process.env.DATABASE_HOST}:28015-bestWishes connected`)
