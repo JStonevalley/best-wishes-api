@@ -8,7 +8,7 @@ A date-time string at UTC, such as 2007-12-03T10:15:30Z, compliant with the `dat
 scalar DateTime
 
 type Mutation {
-  changeWish(description: String, id: String!, image: String, link: String, price: ValueObjectInput, quantity: Int, title: String!, wishListId: String!): Wish
+  changeWish(description: String, id: String!, image: String, link: String, price: ValueObjectInput, quantity: Int, title: String!): Wish
   createUser(email: String!): User
   createWish(description: String, image: String, link: String, price: ValueObjectInput, quantity: Int, title: String!, wishListId: String!): Wish
   createWishList(headline: String!): WishList

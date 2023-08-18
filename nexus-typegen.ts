@@ -190,7 +190,6 @@ export interface NexusGenArgTypes {
       price?: NexusGenInputs['ValueObjectInput'] | null; // ValueObjectInput
       quantity?: number | null; // Int
       title: string; // String!
-      wishListId: string; // String!
     }
     createUser: { // args
       email: string; // String!

@@ -129,10 +129,9 @@ export const wishMutationFields = [
       price: ValueObjectInput,
       image: stringArg(),
       quantity: intArg(),
-      wishListId: nonNull(stringArg()),
     },
     resolve: logResolverInfo(
-      requireAuth(async (_, { id, link, title, description, image, quantity, wishListId, price }, ctx) => {
+      requireAuth(async (_, { id, link, title, description, image, quantity, price }, ctx) => {
         const wish = await ctx.prisma.wish.findUnique({
           where: {
             id,
@@ -163,7 +162,6 @@ export const wishMutationFields = [
             description,
             image,
             quantity: quantity || 1,
-            wishListId,
             price,
           },
         })
