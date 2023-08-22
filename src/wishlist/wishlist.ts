@@ -72,6 +72,26 @@ export const wishListQueryFields = [
       })
     ),
   }),
+  queryField('getShare', {
+    type: ShareSchemaTemplate.$name,
+    args: {
+      id: nonNull(stringArg()),
+    },
+    resolve: logResolverInfo(async (_, { id }: { id: string }, ctx) => {
+      return ctx.prisma.share.findUnique({
+        where: {
+          id,
+        },
+        include: {
+          wishList: {
+            include: {
+              wishes: true,
+            },
+          },
+        },
+      })
+    }),
+  }),
 ]
 
 export const wishListMutationFields = [

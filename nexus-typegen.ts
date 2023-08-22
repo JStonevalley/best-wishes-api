@@ -87,6 +87,7 @@ export interface NexusGenFieldTypes {
     getOwnWish: NexusGenRootTypes['Wish'] | null; // Wish
     getOwnWishList: NexusGenRootTypes['WishList'] | null; // WishList
     getOwnWishLists: Array<NexusGenRootTypes['WishList'] | null> | null; // [WishList]
+    getShare: NexusGenRootTypes['Share'] | null; // Share
   }
   Share: { // field return type
     claimedWishIds: string[]; // [String!]!
@@ -144,6 +145,7 @@ export interface NexusGenFieldTypeNames {
     getOwnWish: 'Wish'
     getOwnWishList: 'WishList'
     getOwnWishLists: 'WishList'
+    getShare: 'Share'
   }
   Share: { // field return type name
     claimedWishIds: 'String'
@@ -226,6 +228,9 @@ export interface NexusGenArgTypes {
       id: string; // String!
     }
     getOwnWishList: { // args
+      id: string; // String!
+    }
+    getShare: { // args
       id: string; // String!
     }
   }

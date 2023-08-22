@@ -21,6 +21,7 @@ type Query {
   getOwnWish(id: String!): Wish
   getOwnWishList(id: String!): WishList
   getOwnWishLists: [WishList]
+  getShare(id: String!): Share
 }
 
 type Share {
