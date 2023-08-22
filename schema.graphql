@@ -9,9 +9,11 @@ scalar DateTime
 
 type Mutation {
   changeWish(description: String, id: String!, image: String, link: String, price: ValueObjectInput, quantity: Int, title: String!): Wish
+  createShare(invitedEmail: String!, wishListId: String!): Share
   createUser(email: String!): User
   createWish(description: String, image: String, link: String, price: ValueObjectInput, quantity: Int, title: String!, wishListId: String!): Wish
   createWishList(headline: String!): WishList
+  removeShare(id: String!): Share
 }
 
 type Query {
@@ -22,6 +24,7 @@ type Query {
 }
 
 type Share {
+  claimedWishIds: [String!]!
   createdAt: DateTime!
   id: ID!
   invitedEmail: String!

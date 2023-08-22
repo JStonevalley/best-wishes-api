@@ -37,6 +37,7 @@ export interface NexusGenObjects {
   Mutation: {};
   Query: {};
   Share: { // root type
+    claimedWishIds: string[]; // [String!]!
     createdAt: NexusGenScalars['DateTime']; // DateTime!
     id: string; // ID!
     invitedEmail: string; // String!
@@ -75,9 +76,11 @@ export type NexusGenAllTypes = NexusGenRootTypes & NexusGenScalars
 export interface NexusGenFieldTypes {
   Mutation: { // field return type
     changeWish: NexusGenRootTypes['Wish'] | null; // Wish
+    createShare: NexusGenRootTypes['Share'] | null; // Share
     createUser: NexusGenRootTypes['User'] | null; // User
     createWish: NexusGenRootTypes['Wish'] | null; // Wish
     createWishList: NexusGenRootTypes['WishList'] | null; // WishList
+    removeShare: NexusGenRootTypes['Share'] | null; // Share
   }
   Query: { // field return type
     getCurrentUser: NexusGenRootTypes['User'] | null; // User
@@ -86,6 +89,7 @@ export interface NexusGenFieldTypes {
     getOwnWishLists: Array<NexusGenRootTypes['WishList'] | null> | null; // [WishList]
   }
   Share: { // field return type
+    claimedWishIds: string[]; // [String!]!
     createdAt: NexusGenScalars['DateTime']; // DateTime!
     id: string; // ID!
     invitedEmail: string; // String!
@@ -129,9 +133,11 @@ export interface NexusGenFieldTypes {
 export interface NexusGenFieldTypeNames {
   Mutation: { // field return type name
     changeWish: 'Wish'
+    createShare: 'Share'
     createUser: 'User'
     createWish: 'Wish'
     createWishList: 'WishList'
+    removeShare: 'Share'
   }
   Query: { // field return type name
     getCurrentUser: 'User'
@@ -140,6 +146,7 @@ export interface NexusGenFieldTypeNames {
     getOwnWishLists: 'WishList'
   }
   Share: { // field return type name
+    claimedWishIds: 'String'
     createdAt: 'DateTime'
     id: 'ID'
     invitedEmail: 'String'
@@ -191,6 +198,10 @@ export interface NexusGenArgTypes {
       quantity?: number | null; // Int
       title: string; // String!
     }
+    createShare: { // args
+      invitedEmail: string; // String!
+      wishListId: string; // String!
+    }
     createUser: { // args
       email: string; // String!
     }
@@ -205,6 +216,9 @@ export interface NexusGenArgTypes {
     }
     createWishList: { // args
       headline: string; // String!
+    }
+    removeShare: { // args
+      id: string; // String!
     }
   }
   Query: {

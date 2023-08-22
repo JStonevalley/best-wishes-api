@@ -25,7 +25,8 @@ export const wishlistTypes = [
         t.field(ShareSchemaTemplate.createdAt),
         t.field(ShareSchemaTemplate.updatedAt),
         t.field(ShareSchemaTemplate.invitedEmail),
-        t.field(ShareSchemaTemplate.wishList)
+        t.field(ShareSchemaTemplate.wishList),
+        t.field(ShareSchemaTemplate.claimedWishIds)
     },
   }),
 ]
@@ -56,6 +57,7 @@ export const wishListQueryFields = [
           },
           include: {
             wishes: true,
+            shares: true,
           },
         })
         if (!wishList)
@@ -85,7 +87,36 @@ export const wishListMutationFields = [
             extensions: { code: 'UNAUTHENTICATED' },
           })
         return ctx.prisma.wishList.create({
-          data: { headline, userId: ctx.user?.id },
+          data: { headline, userId: ctx.user.id },
+        })
+      })
+    ),
+  }),
+  mutationField('createShare', {
+    type: ShareSchemaTemplate.$name,
+    args: {
+      invitedEmail: nonNull(stringArg()),
+      wishListId: nonNull(stringArg()),
+    },
+    resolve: logResolverInfo(
+      requireAuth((_, { invitedEmail, wishListId }: { invitedEmail: string; wishListId: string }, ctx) => {
+        return ctx.prisma.share.create({
+          data: { invitedEmail, wishListId, claimedWishIds: [] },
+        })
+      })
+    ),
+  }),
+  mutationField('removeShare', {
+    type: ShareSchemaTemplate.$name,
+    args: {
+      id: nonNull(stringArg()),
+    },
+    resolve: logResolverInfo(
+      requireAuth((_, { id }: { id: string }, ctx) => {
+        return ctx.prisma.share.delete({
+          where: {
+            id,
+          },
         })
       })
     ),
