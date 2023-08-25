@@ -141,4 +141,40 @@ export const wishListMutationFields = [
       })
     ),
   }),
+  mutationField('claimWish', {
+    type: ShareSchemaTemplate.$name,
+    args: {
+      id: nonNull(stringArg()),
+      wishId: nonNull(stringArg()),
+    },
+    resolve: logResolverInfo(
+      requireAuth(async (_, { id, wishId }: { id: string; wishId: string }, ctx) => {
+        const wishExists = Boolean(
+          await ctx.prisma.wish.findFirst({
+            where: {
+              id: wishId,
+            },
+            select: {
+              id: true,
+            },
+          })
+        )
+        if (!wishExists) {
+          throw new GraphQLError('Wish not found', {
+            extensions: { code: 'NOT_FOUND' },
+          })
+        }
+        return ctx.prisma.share.update({
+          where: {
+            id,
+          },
+          data: {
+            claimedWishIds: {
+              push: wishId,
+            },
+          },
+        })
+      })
+    ),
+  }),
 ]
