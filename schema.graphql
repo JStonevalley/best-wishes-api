@@ -14,6 +14,7 @@ type Mutation {
   createUser(email: String!): User
   createWish(description: String, image: String, link: String, price: ValueObjectInput, quantity: Int, title: String!, wishListId: String!): Wish
   createWishList(headline: String!): WishList
+  removeAWish(id: String!): String
   removeShare(id: String!): Share
   removeWishClaim(id: String!, wishId: String!): Share
 }

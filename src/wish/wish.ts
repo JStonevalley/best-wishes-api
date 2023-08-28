@@ -168,4 +168,20 @@ export const wishMutationFields = [
       })
     ),
   }),
+  mutationField('removeAWish', {
+    type: 'String',
+    args: {
+      id: nonNull(stringArg()),
+    },
+    resolve: logResolverInfo(
+      requireAuth(async (_, { id }, ctx) => {
+        await ctx.prisma.wish.delete({
+          where: {
+            id,
+          },
+        })
+        return id
+      })
+    ),
+  }),
 ]

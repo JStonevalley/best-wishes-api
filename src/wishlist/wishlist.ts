@@ -2,7 +2,6 @@ import { WishList as WishListSchemaTemplate, Share as ShareSchemaTemplate } from
 import { mutationField, nonNull, objectType, queryField, stringArg, list } from 'nexus'
 import { GraphQLError } from 'graphql'
 import { logResolverInfo, requireAuth } from '../resolverTools'
-import { logger } from '../log'
 import { remove } from 'ramda'
 
 export const wishlistTypes = [
