@@ -2,6 +2,8 @@ import { WishList as WishListSchemaTemplate, Share as ShareSchemaTemplate } from
 import { mutationField, nonNull, objectType, queryField, stringArg, list } from 'nexus'
 import { GraphQLError } from 'graphql'
 import { logResolverInfo, requireAuth } from '../resolverTools'
+import { logger } from '../log'
+import { remove } from 'ramda'
 
 export const wishlistTypes = [
   objectType({
@@ -149,19 +151,33 @@ export const wishListMutationFields = [
     },
     resolve: logResolverInfo(
       requireAuth(async (_, { id, wishId }: { id: string; wishId: string }, ctx) => {
-        const wishExists = Boolean(
-          await ctx.prisma.wish.findFirst({
-            where: {
-              id: wishId,
-            },
-            select: {
-              id: true,
-            },
-          })
-        )
-        if (!wishExists) {
+        const wish = await ctx.prisma.wish.findFirst({
+          where: {
+            id: wishId,
+          },
+          select: {
+            id: true,
+            quantity: true,
+            wishListId: true,
+          },
+        })
+        if (!wish?.wishListId) {
           throw new GraphQLError('Wish not found', {
             extensions: { code: 'NOT_FOUND' },
+          })
+        }
+        const shares = await ctx.prisma.share.findMany({
+          where: {
+            wishListId: wish.wishListId,
+          },
+          select: {
+            claimedWishIds: true,
+          },
+        })
+        const quantityClaimed = shares.flatMap((share) => share.claimedWishIds).filter((id) => id === wishId).length
+        if (quantityClaimed >= wish.quantity) {
+          throw new GraphQLError('No wish left to claim', {
+            extensions: { code: 'OUT_OF_QUANTITY' },
           })
         }
         return ctx.prisma.share.update({
@@ -172,6 +188,39 @@ export const wishListMutationFields = [
             claimedWishIds: {
               push: wishId,
             },
+          },
+        })
+      })
+    ),
+  }),
+  mutationField('removeWishClaim', {
+    type: ShareSchemaTemplate.$name,
+    args: {
+      id: nonNull(stringArg()),
+      wishId: nonNull(stringArg()),
+    },
+    resolve: logResolverInfo(
+      requireAuth(async (_, { id, wishId }: { id: string; wishId: string }, ctx) => {
+        const share = await ctx.prisma.share.findFirst({
+          where: {
+            id,
+          },
+        })
+        if (!share) {
+          throw new GraphQLError('Share not found', {
+            extensions: { code: 'NOT_FOUND' },
+          })
+        }
+        const indexOfClaimedWish = share.claimedWishIds.indexOf(wishId)
+        if (indexOfClaimedWish === -1) {
+          return share
+        }
+        return ctx.prisma.share.update({
+          where: {
+            id,
+          },
+          data: {
+            claimedWishIds: remove(indexOfClaimedWish, 1, share.claimedWishIds),
           },
         })
       })

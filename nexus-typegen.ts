@@ -82,6 +82,7 @@ export interface NexusGenFieldTypes {
     createWish: NexusGenRootTypes['Wish'] | null; // Wish
     createWishList: NexusGenRootTypes['WishList'] | null; // WishList
     removeShare: NexusGenRootTypes['Share'] | null; // Share
+    removeWishClaim: NexusGenRootTypes['Share'] | null; // Share
   }
   Query: { // field return type
     getCurrentUser: NexusGenRootTypes['User'] | null; // User
@@ -141,6 +142,7 @@ export interface NexusGenFieldTypeNames {
     createWish: 'Wish'
     createWishList: 'WishList'
     removeShare: 'Share'
+    removeWishClaim: 'Share'
   }
   Query: { // field return type name
     getCurrentUser: 'User'
@@ -227,6 +229,10 @@ export interface NexusGenArgTypes {
     }
     removeShare: { // args
       id: string; // String!
+    }
+    removeWishClaim: { // args
+      id: string; // String!
+      wishId: string; // String!
     }
   }
   Query: {
