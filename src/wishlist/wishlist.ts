@@ -93,6 +93,18 @@ export const wishListQueryFields = [
       })
     }),
   }),
+  queryField('getOwnShares', {
+    type: list(ShareSchemaTemplate.$name),
+    resolve: logResolverInfo(
+      requireAuth(async (_, __, ctx) => {
+        return ctx.prisma.share.findMany({
+          where: {
+            invitedEmail: ctx.user?.email,
+          },
+        })
+      })
+    ),
+  }),
 ]
 
 export const wishListMutationFields = [

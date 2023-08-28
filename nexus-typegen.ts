@@ -87,6 +87,7 @@ export interface NexusGenFieldTypes {
   }
   Query: { // field return type
     getCurrentUser: NexusGenRootTypes['User'] | null; // User
+    getOwnShares: Array<NexusGenRootTypes['Share'] | null> | null; // [Share]
     getOwnWish: NexusGenRootTypes['Wish'] | null; // Wish
     getOwnWishList: NexusGenRootTypes['WishList'] | null; // WishList
     getOwnWishLists: Array<NexusGenRootTypes['WishList'] | null> | null; // [WishList]
@@ -148,6 +149,7 @@ export interface NexusGenFieldTypeNames {
   }
   Query: { // field return type name
     getCurrentUser: 'User'
+    getOwnShares: 'Share'
     getOwnWish: 'Wish'
     getOwnWishList: 'WishList'
     getOwnWishLists: 'WishList'
