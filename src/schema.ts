@@ -27,7 +27,7 @@ export const schema = makeSchema({
     ],
   },
   outputs: {
-    typegen: join(__dirname, '..', 'nexus-typegen.ts'),
+    typegen: join(__dirname, '..', 'generated', 'nexus-prisma', 'index.d.ts'),
     schema: join(__dirname, '..', 'schema.graphql'),
   },
   contextType: {

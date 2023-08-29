@@ -12,6 +12,7 @@ export const wishlistTypes = [
       t.field(WishListSchemaTemplate.id),
         t.field(WishListSchemaTemplate.createdAt),
         t.field(WishListSchemaTemplate.updatedAt),
+        t.field(WishListSchemaTemplate.archivedAt),
         t.field(WishListSchemaTemplate.headline),
         t.field(WishListSchemaTemplate.user),
         t.field(WishListSchemaTemplate.wishes),
@@ -128,6 +129,70 @@ export const wishListMutationFields = [
           })
         return ctx.prisma.wishList.create({
           data: { headline, userId: ctx.user.id },
+        })
+      })
+    ),
+  }),
+  mutationField('archiveWishList', {
+    type: WishListSchemaTemplate.$name,
+    args: {
+      id: nonNull(stringArg()),
+    },
+    resolve: logResolverInfo(
+      requireAuth(async (_, { id }: { id: string }, ctx) => {
+        if (!ctx.user)
+          throw new GraphQLError('Unauthenticated', {
+            extensions: { code: 'UNAUTHENTICATED' },
+          })
+        const wishList = await ctx.prisma.wishList.findFirst({
+          where: {
+            id,
+          },
+          select: {
+            userId: true,
+          },
+        })
+        if (wishList?.userId !== ctx.user.id)
+          throw new GraphQLError('User is not allowed to archive this list', {
+            extensions: { code: 'NOT_OWNER' },
+          })
+        return ctx.prisma.wishList.update({
+          where: {
+            id,
+          },
+          data: { archivedAt: new Date() },
+        })
+      })
+    ),
+  }),
+  mutationField('unarchiveWishList', {
+    type: WishListSchemaTemplate.$name,
+    args: {
+      id: nonNull(stringArg()),
+    },
+    resolve: logResolverInfo(
+      requireAuth(async (_, { id }: { id: string }, ctx) => {
+        if (!ctx.user)
+          throw new GraphQLError('Unauthenticated', {
+            extensions: { code: 'UNAUTHENTICATED' },
+          })
+        const wishList = await ctx.prisma.wishList.findFirst({
+          where: {
+            id,
+          },
+          select: {
+            userId: true,
+          },
+        })
+        if (wishList?.userId !== ctx.user.id)
+          throw new GraphQLError('User is not allowed to unarchive this list', {
+            extensions: { code: 'NOT_OWNER' },
+          })
+        return ctx.prisma.wishList.update({
+          where: {
+            id,
+          },
+          data: { archivedAt: null },
         })
       })
     ),

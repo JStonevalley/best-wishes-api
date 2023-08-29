@@ -4,8 +4,8 @@
  */
 
 
-import type { Context } from "./src/context"
-import type { Wish } from "./node_modules/@prisma/client/index"
+import type { Context } from "./../../src/context"
+import type { Wish } from "./../../node_modules/@prisma/client/index"
 
 
 
@@ -56,6 +56,7 @@ export interface NexusGenObjects {
   }
   Wish: Wish;
   WishList: { // root type
+    archivedAt?: NexusGenScalars['DateTime'] | null; // DateTime
     createdAt: NexusGenScalars['DateTime']; // DateTime!
     headline: string; // String!
     id: string; // ID!
@@ -75,6 +76,7 @@ export type NexusGenAllTypes = NexusGenRootTypes & NexusGenScalars
 
 export interface NexusGenFieldTypes {
   Mutation: { // field return type
+    archiveWishList: NexusGenRootTypes['WishList'] | null; // WishList
     changeWish: NexusGenRootTypes['Wish'] | null; // Wish
     claimWish: NexusGenRootTypes['Share'] | null; // Share
     createShare: NexusGenRootTypes['Share'] | null; // Share
@@ -84,6 +86,7 @@ export interface NexusGenFieldTypes {
     removeAWish: string | null; // String
     removeShare: NexusGenRootTypes['Share'] | null; // Share
     removeWishClaim: NexusGenRootTypes['Share'] | null; // Share
+    unarchiveWishList: NexusGenRootTypes['WishList'] | null; // WishList
   }
   Query: { // field return type
     getCurrentUser: NexusGenRootTypes['User'] | null; // User
@@ -125,6 +128,7 @@ export interface NexusGenFieldTypes {
     wishList: NexusGenRootTypes['WishList'] | null; // WishList
   }
   WishList: { // field return type
+    archivedAt: NexusGenScalars['DateTime'] | null; // DateTime
     createdAt: NexusGenScalars['DateTime']; // DateTime!
     headline: string; // String!
     id: string; // ID!
@@ -137,6 +141,7 @@ export interface NexusGenFieldTypes {
 
 export interface NexusGenFieldTypeNames {
   Mutation: { // field return type name
+    archiveWishList: 'WishList'
     changeWish: 'Wish'
     claimWish: 'Share'
     createShare: 'Share'
@@ -146,6 +151,7 @@ export interface NexusGenFieldTypeNames {
     removeAWish: 'String'
     removeShare: 'Share'
     removeWishClaim: 'Share'
+    unarchiveWishList: 'WishList'
   }
   Query: { // field return type name
     getCurrentUser: 'User'
@@ -187,6 +193,7 @@ export interface NexusGenFieldTypeNames {
     wishList: 'WishList'
   }
   WishList: { // field return type name
+    archivedAt: 'DateTime'
     createdAt: 'DateTime'
     headline: 'String'
     id: 'ID'
@@ -199,6 +206,9 @@ export interface NexusGenFieldTypeNames {
 
 export interface NexusGenArgTypes {
   Mutation: {
+    archiveWishList: { // args
+      id: string; // String!
+    }
     changeWish: { // args
       description?: string | null; // String
       id: string; // String!
@@ -240,6 +250,9 @@ export interface NexusGenArgTypes {
     removeWishClaim: { // args
       id: string; // String!
       wishId: string; // String!
+    }
+    unarchiveWishList: { // args
+      id: string; // String!
     }
   }
   Query: {

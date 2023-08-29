@@ -8,6 +8,7 @@ A date-time string at UTC, such as 2007-12-03T10:15:30Z, compliant with the `dat
 scalar DateTime
 
 type Mutation {
+  archiveWishList(id: String!): WishList
   changeWish(description: String, id: String!, image: String, link: String, price: ValueObjectInput, quantity: Int, title: String!): Wish
   claimWish(id: String!, wishId: String!): Share
   createShare(invitedEmail: String!, wishListId: String!): Share
@@ -17,6 +18,7 @@ type Mutation {
   removeAWish(id: String!): String
   removeShare(id: String!): Share
   removeWishClaim(id: String!, wishId: String!): Share
+  unarchiveWishList(id: String!): WishList
 }
 
 type Query {
@@ -75,6 +77,7 @@ type Wish {
 }
 
 type WishList {
+  archivedAt: DateTime
   createdAt: DateTime!
   headline: String!
   id: ID!
