@@ -101,6 +101,13 @@ export const wishListQueryFields = [
           where: {
             invitedEmail: ctx.user?.email,
           },
+          include: {
+            wishList: {
+              include: {
+                wishes: true,
+              },
+            },
+          },
         })
       })
     ),
