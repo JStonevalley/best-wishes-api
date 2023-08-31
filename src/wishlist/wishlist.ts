@@ -3,6 +3,7 @@ import { mutationField, nonNull, objectType, queryField, stringArg, list } from 
 import { GraphQLError } from 'graphql'
 import { logResolverInfo, requireAuth } from '../resolverTools'
 import { remove } from 'ramda'
+import { syncWishOrder } from './utils'
 
 export const wishlistTypes = [
   objectType({
@@ -16,6 +17,7 @@ export const wishlistTypes = [
         t.field(WishListSchemaTemplate.headline),
         t.field(WishListSchemaTemplate.user),
         t.field(WishListSchemaTemplate.wishes),
+        t.field(WishListSchemaTemplate.wishOrder),
         t.field(WishListSchemaTemplate.shares)
     },
   }),
@@ -128,7 +130,7 @@ export const wishListMutationFields = [
             extensions: { code: 'UNAUTHENTICATED' },
           })
         return ctx.prisma.wishList.create({
-          data: { headline, userId: ctx.user.id },
+          data: { headline, userId: ctx.user.id, wishOrder: [] },
         })
       })
     ),
@@ -194,6 +196,34 @@ export const wishListMutationFields = [
           },
           data: { archivedAt: null },
         })
+      })
+    ),
+  }),
+  mutationField('updateWishOrderForWishList', {
+    type: WishListSchemaTemplate.$name,
+    args: {
+      id: nonNull(stringArg()),
+      wishOrder: nonNull(list(nonNull(stringArg()))),
+    },
+    resolve: logResolverInfo(
+      requireAuth(async (_, { id, wishOrder }: { id: string; wishOrder: string[] }, ctx) => {
+        if (!ctx.user)
+          throw new GraphQLError('Unauthenticated', {
+            extensions: { code: 'UNAUTHENTICATED' },
+          })
+        const wishList = await ctx.prisma.wishList.findFirst({
+          where: {
+            id,
+          },
+          select: {
+            userId: true,
+          },
+        })
+        if (wishList?.userId !== ctx.user.id)
+          throw new GraphQLError('User is not allowed to change wish order of this list', {
+            extensions: { code: 'NOT_OWNER' },
+          })
+        return syncWishOrder(ctx.prisma)({ wishOrder, wishListId: id })
       })
     ),
   }),

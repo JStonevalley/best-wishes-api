@@ -61,6 +61,7 @@ export interface NexusGenObjects {
     headline: string; // String!
     id: string; // ID!
     updatedAt: NexusGenScalars['DateTime']; // DateTime!
+    wishOrder: string[]; // [String!]!
   }
 }
 
@@ -87,6 +88,7 @@ export interface NexusGenFieldTypes {
     removeShare: NexusGenRootTypes['Share'] | null; // Share
     removeWishClaim: NexusGenRootTypes['Share'] | null; // Share
     unarchiveWishList: NexusGenRootTypes['WishList'] | null; // WishList
+    updateWishOrderForWishList: NexusGenRootTypes['WishList'] | null; // WishList
   }
   Query: { // field return type
     getCurrentUser: NexusGenRootTypes['User'] | null; // User
@@ -135,6 +137,7 @@ export interface NexusGenFieldTypes {
     shares: NexusGenRootTypes['Share'][]; // [Share!]!
     updatedAt: NexusGenScalars['DateTime']; // DateTime!
     user: NexusGenRootTypes['User']; // User!
+    wishOrder: string[]; // [String!]!
     wishes: NexusGenRootTypes['Wish'][]; // [Wish!]!
   }
 }
@@ -152,6 +155,7 @@ export interface NexusGenFieldTypeNames {
     removeShare: 'Share'
     removeWishClaim: 'Share'
     unarchiveWishList: 'WishList'
+    updateWishOrderForWishList: 'WishList'
   }
   Query: { // field return type name
     getCurrentUser: 'User'
@@ -200,6 +204,7 @@ export interface NexusGenFieldTypeNames {
     shares: 'Share'
     updatedAt: 'DateTime'
     user: 'User'
+    wishOrder: 'String'
     wishes: 'Wish'
   }
 }
@@ -253,6 +258,10 @@ export interface NexusGenArgTypes {
     }
     unarchiveWishList: { // args
       id: string; // String!
+    }
+    updateWishOrderForWishList: { // args
+      id: string; // String!
+      wishOrder: string[]; // [String!]!
     }
   }
   Query: {

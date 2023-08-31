@@ -105,7 +105,7 @@ export const wishMutationFields = [
           throw new GraphQLError('This user is not the owner of the wish list', {
             extensions: { code: 'FORBIDDEN' },
           })
-        return ctx.prisma.wish.create({
+        const wish = await ctx.prisma.wish.create({
           data: {
             link,
             title,
@@ -116,6 +116,17 @@ export const wishMutationFields = [
             price,
           },
         })
+        await ctx.prisma.wishList.update({
+          where: {
+            id: wishListId,
+          },
+          data: {
+            wishOrder: {
+              push: wish.id,
+            },
+          },
+        })
+        return wish
       })
     ),
   }),

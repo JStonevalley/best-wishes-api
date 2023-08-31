@@ -19,6 +19,7 @@ type Mutation {
   removeShare(id: String!): Share
   removeWishClaim(id: String!, wishId: String!): Share
   unarchiveWishList(id: String!): WishList
+  updateWishOrderForWishList(id: String!, wishOrder: [String!]!): WishList
 }
 
 type Query {
@@ -84,5 +85,6 @@ type WishList {
   shares: [Share!]!
   updatedAt: DateTime!
   user: User!
+  wishOrder: [String!]!
   wishes: [Wish!]!
 }
