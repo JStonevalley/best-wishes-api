@@ -2,13 +2,14 @@ import { PrismaClient, User } from '@prisma/client'
 import { initializeApp, applicationDefault } from 'firebase-admin/app'
 import { getAuth } from 'firebase-admin/auth'
 import { logger } from './log'
+import { GraphQLError } from 'graphql'
 
 const prisma = new PrismaClient()
 initializeApp({
   credential: applicationDefault(),
   projectId: 'bestwishes-ab288',
 })
-export interface Context {
+export interface ApolloContext {
   prisma: PrismaClient
   user: User | null
   googleUserId: string | null
@@ -35,7 +36,16 @@ export const setupContext = async ({ req }: any) => {
       googleUserId,
     }
   } catch (error: any) {
-    logger.error(error)
+    if (error?.errorInfo) {
+      logger.error(error)
+      throw new GraphQLError(error.errorInfo.message, {
+        extensions: {
+          firebaseCode: error.errorInfo.code,
+          code: 'INVALID_ID_TOKEN',
+          http: { status: 200 },
+        },
+      })
+    }
     return {
       prisma,
       user: null,
