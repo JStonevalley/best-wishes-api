@@ -289,7 +289,7 @@ export const wishListMutationFields = [
                   context: {
                     fromEmail: share.wishList.user.email,
                     wishListTitle: share.wishList.headline,
-                    wishListLink: `https://bestwishes.io/share/${share.id}`,
+                    wishListLink: `${ctx.origin}/shared/${share.id}`,
                   },
                 })
               )

@@ -13,6 +13,7 @@ export interface ApolloContext {
   prisma: PrismaClient
   user: User | null
   googleUserId: string | null
+  origin: string
 }
 export const setupContext = async ({ req }: any) => {
   const idToken = req.headers.authorization
@@ -21,6 +22,7 @@ export const setupContext = async ({ req }: any) => {
       prisma,
       user: null,
       googleUserId: null,
+      origin: req.headers.origin,
     }
   }
   try {
@@ -34,6 +36,7 @@ export const setupContext = async ({ req }: any) => {
       prisma,
       user,
       googleUserId,
+      origin: req.headers.origin,
     }
   } catch (error: any) {
     if (error?.errorInfo) {
@@ -50,6 +53,7 @@ export const setupContext = async ({ req }: any) => {
       prisma,
       user: null,
       googleUserId: null,
+      origin: req.headers.origin,
     }
   }
 }
