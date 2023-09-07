@@ -5,7 +5,7 @@ import { logger } from '../log'
 const mailersend = new MailerSend({
   apiKey: process.env.MAILERSEND_API_KEY || '',
 })
-const sender = new Sender('Best wishes', 'transactional.bestwishes.io')
+const sender = new Sender('no-reply@transactional.bestwishes.io', 'Bestwishes')
 
 interface EmailSendInput<T> {
   toEmail: string
@@ -15,7 +15,7 @@ interface EmailSendInput<T> {
 export const sendShareEmail = ({ toEmail, context }: EmailSendInput<ShareEmailContext>) => {
   logger.info(toEmail)
   logger.info(context)
-  toEmail = process.env.NODE_ENV === 'development' ? process.env.EMAIL_SINK || '' : toEmail
+  toEmail = process.env.ENV === 'development' ? process.env.EMAIL_SINK || '' : toEmail
   const recipients = [new Recipient(toEmail)]
 
   const emailParams = new EmailParams()
