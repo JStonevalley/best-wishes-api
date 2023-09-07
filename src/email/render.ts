@@ -3,7 +3,7 @@ import { compile } from 'handlebars'
 import { readFileSync } from 'fs'
 import path from 'path'
 
-interface ShareEmailContext {
+export interface ShareEmailContext {
   fromEmail: string
   wishListTitle: string
   wishListLink: string
