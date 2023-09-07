@@ -18,6 +18,7 @@ type Mutation {
   removeAWish(id: String!): String
   removeShare(id: String!): Share
   removeWishClaim(id: String!, wishId: String!): Share
+  sendShareEmails(shareIds: [String!]!): Boolean
   unarchiveWishList(id: String!): WishList
   updateWishOrderForWishList(id: String!, wishOrder: [String!]!): WishList
 }

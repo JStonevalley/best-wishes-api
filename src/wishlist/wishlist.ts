@@ -4,6 +4,9 @@ import { GraphQLError } from 'graphql'
 import { logResolverInfo, requireAuth } from '../resolverTools'
 import { remove } from 'ramda'
 import { syncWishOrder } from './utils'
+import { sendShareEmail } from '../email/send'
+import { logger } from '../log'
+import { Share } from '.prisma/client'
 
 export const wishlistTypes = [
   objectType({
@@ -256,6 +259,51 @@ export const wishListMutationFields = [
       })
     ),
   }),
+  mutationField('sendShareEmails', {
+    type: 'Boolean',
+    args: {
+      shareIds: nonNull(list(nonNull(stringArg()))),
+    },
+    resolve: logResolverInfo(
+      requireAuth(async (_, { shareIds }: { shareIds: string[] }, ctx) => {
+        const shares = await ctx.prisma.share.findMany({
+          where: {
+            id: {
+              in: shareIds,
+            },
+          },
+          include: {
+            wishList: {
+              include: {
+                user: true,
+              },
+            },
+          },
+        })
+        if (shares.length === shareIds.length) {
+          try {
+            await Promise.all(
+              shares.map((share: any) =>
+                sendShareEmail({
+                  toEmail: share.invitedEmail,
+                  context: {
+                    fromEmail: share.wishList.user.email,
+                    wishListTitle: share.wishList.headline,
+                    wishListLink: `https://bestwishes.io/share/${share.id}`,
+                  },
+                })
+              )
+            )
+            return true
+          } catch (error) {
+            logger.error(error)
+            return false
+          }
+        }
+        throw new GraphQLError('Share not found', { extensions: { code: 'BAD_USER_INPUT' } })
+      })
+    ),
+  }),
   mutationField('claimWish', {
     type: ShareSchemaTemplate.$name,
     args: {
@@ -287,7 +335,9 @@ export const wishListMutationFields = [
             claimedWishIds: true,
           },
         })
-        const quantityClaimed = shares.flatMap((share) => share.claimedWishIds).filter((id) => id === wishId).length
+        const quantityClaimed = shares
+          .flatMap((share: any) => share.claimedWishIds)
+          .filter((id: string) => id === wishId).length
         if (quantityClaimed >= wish.quantity) {
           throw new GraphQLError('No wish left to claim', {
             extensions: { code: 'OUT_OF_QUANTITY' },

@@ -87,6 +87,7 @@ export interface NexusGenFieldTypes {
     removeAWish: string | null; // String
     removeShare: NexusGenRootTypes['Share'] | null; // Share
     removeWishClaim: NexusGenRootTypes['Share'] | null; // Share
+    sendShareEmails: boolean | null; // Boolean
     unarchiveWishList: NexusGenRootTypes['WishList'] | null; // WishList
     updateWishOrderForWishList: NexusGenRootTypes['WishList'] | null; // WishList
   }
@@ -154,6 +155,7 @@ export interface NexusGenFieldTypeNames {
     removeAWish: 'String'
     removeShare: 'Share'
     removeWishClaim: 'Share'
+    sendShareEmails: 'Boolean'
     unarchiveWishList: 'WishList'
     updateWishOrderForWishList: 'WishList'
   }
@@ -255,6 +257,9 @@ export interface NexusGenArgTypes {
     removeWishClaim: { // args
       id: string; // String!
       wishId: string; // String!
+    }
+    sendShareEmails: { // args
+      shareIds: string[]; // [String!]!
     }
     unarchiveWishList: { // args
       id: string; // String!
