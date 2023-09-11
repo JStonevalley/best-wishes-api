@@ -6,7 +6,6 @@ import { remove } from 'ramda'
 import { syncWishOrder } from './utils'
 import { sendShareEmail } from '../email/send'
 import { logger } from '../log'
-import { Share } from '.prisma/client'
 
 export const wishlistTypes = [
   objectType({
