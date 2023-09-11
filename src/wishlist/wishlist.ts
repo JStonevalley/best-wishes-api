@@ -1,4 +1,4 @@
-import { WishList as WishListSchemaTemplate, Share as ShareSchemaTemplate } from 'nexus-prisma'
+import { WishList as WishListSchemaTemplate, Share as ShareSchemaTemplate } from '../../generated/nexus-prisma'
 import { mutationField, nonNull, objectType, queryField, stringArg, list } from 'nexus'
 import { GraphQLError } from 'graphql'
 import { logResolverInfo, requireAuth } from '../resolverTools'

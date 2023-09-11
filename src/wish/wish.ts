@@ -1,4 +1,4 @@
-import { Wish as WishSchemaTemplate } from 'nexus-prisma'
+import { Wish as WishSchemaTemplate } from '../../generated/nexus-prisma'
 import { inputObjectType, intArg, mutationField, nonNull, objectType, queryField, stringArg } from 'nexus'
 import { GraphQLError } from 'graphql'
 import { logResolverInfo, requireAuth } from '../resolverTools'

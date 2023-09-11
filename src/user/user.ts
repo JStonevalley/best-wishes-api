@@ -1,4 +1,4 @@
-import { User as UserSchemaTemplate } from 'nexus-prisma'
+import { User as UserSchemaTemplate } from '../../generated/nexus-prisma'
 import { objectType, queryField, mutationField, stringArg, nonNull } from 'nexus'
 import { GraphQLError } from 'graphql'
 import { logResolverInfo, requireAuth } from '../resolverTools'
