@@ -1,3 +1,6 @@
 # Best Wishes API
-## Start db in background
-- rethinkdb --bind all & disown $!
+## Database
+### Start
+`sudo service postgresql start`
+### Stop
+`sudo service postgresql stop`
