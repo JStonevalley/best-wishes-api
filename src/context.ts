@@ -7,7 +7,7 @@ import { GraphQLError } from 'graphql'
 const prisma = new PrismaClient()
 initializeApp({
   credential: applicationDefault(),
-  projectId: 'bestwishes-ab288',
+  projectId: process.env.FIREBASE_PROJECT_ID,
 })
 export interface ApolloContext {
   prisma: PrismaClient
