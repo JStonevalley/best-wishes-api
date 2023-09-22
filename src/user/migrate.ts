@@ -16,7 +16,7 @@ export const migrateV1Data = (prisma: PrismaClient) => async (user: User) => {
           data: { archivedAt: new Date(archivedAt) },
         })
       }
-      if (wishes && wishes.length > 0) {
+      if (wishes?.length > 0) {
         await prisma.wish.createMany({
           data: wishes.map((wish: any) => ({ ...wish, wishListId })),
         })
