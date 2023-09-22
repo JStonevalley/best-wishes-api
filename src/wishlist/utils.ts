@@ -33,3 +33,11 @@ export const syncWishOrder =
       },
     })
   }
+
+export const createWishList =
+  (prisma: PrismaClient) =>
+  async ({ headline, userId }: { headline: string; userId: string }) => {
+    return prisma.wishList.create({
+      data: { headline, userId, wishOrder: [] },
+    })
+  }

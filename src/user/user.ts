@@ -2,6 +2,7 @@ import { User as UserSchemaTemplate } from '../../generated/nexus-prisma'
 import { objectType, queryField, mutationField, stringArg, nonNull } from 'nexus'
 import { GraphQLError } from 'graphql'
 import { logResolverInfo, requireAuth } from '../resolverTools'
+import { migrateV1Data } from './migrate'
 
 export const userTypes = [
   objectType({
@@ -30,14 +31,16 @@ export const userMutationFields = [
     args: {
       email: nonNull(stringArg()),
     },
-    resolve: logResolverInfo((_, { email }: { email: string }, ctx) => {
+    resolve: logResolverInfo(async (_, { email }: { email: string }, ctx) => {
       if (!ctx.googleUserId)
         throw new GraphQLError('Unauthenticated', {
           extensions: { code: 'UNAUTHENTICATED' },
         })
-      return ctx.prisma.user.create({
+      const user = await ctx.prisma.user.create({
         data: { email, googleUserId: ctx.googleUserId },
       })
+      await migrateV1Data(ctx.prisma)(user)
+      return user
     }),
   }),
 ]

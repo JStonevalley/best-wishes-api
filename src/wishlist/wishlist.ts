@@ -3,7 +3,7 @@ import { mutationField, nonNull, objectType, queryField, stringArg, list } from 
 import { GraphQLError } from 'graphql'
 import { logResolverInfo, requireAuth } from '../resolverTools'
 import { remove } from 'ramda'
-import { syncWishOrder } from './utils'
+import { createWishList, syncWishOrder } from './utils'
 import { sendShareEmail } from '../email/send'
 import { logger } from '../log'
 
@@ -131,9 +131,7 @@ export const wishListMutationFields = [
           throw new GraphQLError('Unauthenticated', {
             extensions: { code: 'UNAUTHENTICATED' },
           })
-        return ctx.prisma.wishList.create({
-          data: { headline, userId: ctx.user.id, wishOrder: [] },
-        })
+        return createWishList(ctx.prisma)({ headline, userId: ctx.user.id })
       })
     ),
   }),
