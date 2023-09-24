@@ -173,7 +173,7 @@ export const wishMutationFields = [
             description,
             image,
             quantity: quantity || 1,
-            price,
+            price: price || null,
           },
         })
       })
