@@ -137,6 +137,39 @@ export const wishListMutationFields = [
       })
     ),
   }),
+  mutationField('changeWishList', {
+    type: WishListSchemaTemplate.$name,
+    args: {
+      id: nonNull(stringArg()),
+      headline: nonNull(stringArg()),
+    },
+    resolve: logResolverInfo(
+      requireAuth(async (_, { id, headline }: { id: string; headline: string }, ctx) => {
+        if (!ctx.user)
+          throw new GraphQLError('Unauthenticated', {
+            extensions: { code: 'UNAUTHENTICATED' },
+          })
+        const wishList = await ctx.prisma.wishList.findFirst({
+          where: {
+            id,
+          },
+          select: {
+            userId: true,
+          },
+        })
+        if (wishList?.userId !== ctx.user.id)
+          throw new GraphQLError('User is not allowed to archive this list', {
+            extensions: { code: 'NOT_OWNER' },
+          })
+        return ctx.prisma.wishList.update({
+          where: {
+            id,
+          },
+          data: { headline },
+        })
+      })
+    ),
+  }),
   mutationField('archiveWishList', {
     type: WishListSchemaTemplate.$name,
     args: {
