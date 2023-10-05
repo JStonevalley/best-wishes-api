@@ -10,6 +10,7 @@ scalar DateTime
 type Mutation {
   archiveWishList(id: String!): WishList
   changeWish(description: String, id: String!, image: String, link: String, price: ValueObjectInput, quantity: Int, title: String!): Wish
+  changeWishList(headline: String!, id: String!): WishList
   claimWish(id: String!, wishId: String!): Share
   createShare(invitedEmail: String!, wishListId: String!): Share
   createUser(email: String!): User

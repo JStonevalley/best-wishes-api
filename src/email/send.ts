@@ -12,7 +12,7 @@ interface EmailSendInput<T> {
 }
 
 export const sendShareEmail = ({ toEmail, context }: EmailSendInput<ShareEmailContext>) => {
-  toEmail = process.env.ENV === 'development' ? process.env.EMAIL_SINK || '' : toEmail
+  toEmail = process.env.ENV === 'production' ? toEmail : process.env.EMAIL_SINK || ''
   const recipients = [new Recipient(toEmail)]
 
   const emailParams = new EmailParams()
