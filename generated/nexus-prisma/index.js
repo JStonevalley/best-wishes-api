@@ -4,7 +4,7 @@ const RuntimeSettings = require('nexus-prisma/dist-cjs/generator/Settings/Runtim
 
 const gentimeSettingsData = {
   "output": {
-    "directory": "C:\\Users\\Jonas\\Development\\best-wishes-api\\generated\\nexus-prisma",
+    "directory": "/Users/jonas/Development/best-wishes-api/generated/nexus-prisma",
     "name": "index"
   },
   "projectIdIntToGraphQL": "Int",
