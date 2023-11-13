@@ -143,4 +143,8 @@ dist
 
 # End of https://www.toptal.com/developers/gitignore/api/node
 
+# For mac development
 .DS_Store
+
+# Google Firebase credentials file
+google-firebase-credentials.json

@@ -4,6 +4,9 @@ import { getAuth } from 'firebase-admin/auth'
 import { logger } from './log'
 import { GraphQLError } from 'graphql'
 
+if (!process.env.FIREBASE_PROJECT_ID) logger.info('Missing FIREBASE_PROJECT_ID in environment')
+if (!process.env.GOOGLE_APPLICATION_CREDENTIALS) logger.info('Missing GOOGLE_APPLICATION_CREDENTIALS in environment')
+
 const prisma = new PrismaClient()
 initializeApp({
   credential: applicationDefault(),
