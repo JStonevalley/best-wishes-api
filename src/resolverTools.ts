@@ -1,24 +1,22 @@
-import { GraphQLError } from 'graphql'
-import { FieldResolver } from 'nexus'
+import { GraphQLError, GraphQLResolveInfo } from 'graphql'
+import { Context } from './context'
 import { logger } from './log'
 
+type GraphQLFieldResolver = (parent: any, args: any, context: Context, info: GraphQLResolveInfo) => any
+
 export const requireAuth =
-  <TypeName extends string, FieldName extends string>(
-    next: FieldResolver<TypeName, FieldName>
-  ): FieldResolver<TypeName, FieldName> =>
-  (parent, args, contextValue, info) => {
-    if (!contextValue.user)
+  (next: GraphQLFieldResolver): GraphQLFieldResolver =>
+  (parent, args, context, info) => {
+    if (!context.user)
       throw new GraphQLError('Unauthenticated', {
         extensions: { code: 'UNAUTHENTICATED' },
       })
-    return next(parent, args, contextValue, info)
+    return next(parent, args, context, info)
   }
 
 export const logResolverInfo =
-  <TypeName extends string, FieldName extends string>(
-    next: FieldResolver<TypeName, FieldName>
-  ): FieldResolver<TypeName, FieldName> =>
-  (parent, args, contextValue, info) => {
+  (next: GraphQLFieldResolver): GraphQLFieldResolver =>
+  (parent, args, context, info) => {
     logger.info(info.fieldName)
-    return next(parent, args, contextValue, info)
+    return next(parent, args, context, info)
   }
