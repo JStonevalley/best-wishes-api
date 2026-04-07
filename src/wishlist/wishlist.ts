@@ -1,9 +1,9 @@
 import { GraphQLError } from 'graphql'
-import { logResolverInfo, requireAuth } from '../resolverTools'
 import { remove } from 'ramda'
-import { createWishList, syncWishOrder } from './utils'
 import { sendShareEmail } from '../email/send'
 import { logger } from '../log'
+import { logResolverInfo, requireAuth } from '../resolverTools'
+import { createWishList, syncWishOrder } from './utils'
 
 export const wishlistResolvers = {
   WishList: {
@@ -32,7 +32,7 @@ export const wishlistResolvers = {
         return ctx.prisma.wishList.findMany({
           where: { userId: ctx.user?.id },
         })
-      })
+      }),
     ),
     getOwnWishList: logResolverInfo(
       requireAuth(async (_: any, { id }: { id: string }, ctx) => {
@@ -49,7 +49,7 @@ export const wishlistResolvers = {
             extensions: { code: 'FORBIDDEN' },
           })
         return wishList
-      })
+      }),
     ),
     getShare: logResolverInfo(async (_: any, { id }: { id: string }, ctx) => {
       return ctx.prisma.share.findUnique({
@@ -71,7 +71,7 @@ export const wishlistResolvers = {
             },
           },
         })
-      })
+      }),
     ),
   },
   Mutation: {
@@ -82,7 +82,7 @@ export const wishlistResolvers = {
             extensions: { code: 'UNAUTHENTICATED' },
           })
         return createWishList(ctx.prisma)({ headline, userId: ctx.user.id })
-      })
+      }),
     ),
     changeWishList: logResolverInfo(
       requireAuth(async (_: any, { id, headline }: { id: string; headline: string }, ctx) => {
@@ -102,7 +102,7 @@ export const wishlistResolvers = {
           where: { id },
           data: { headline },
         })
-      })
+      }),
     ),
     archiveWishList: logResolverInfo(
       requireAuth(async (_: any, { id }: { id: string }, ctx) => {
@@ -122,7 +122,7 @@ export const wishlistResolvers = {
           where: { id },
           data: { archivedAt: new Date() },
         })
-      })
+      }),
     ),
     unarchiveWishList: logResolverInfo(
       requireAuth(async (_: any, { id }: { id: string }, ctx) => {
@@ -142,7 +142,7 @@ export const wishlistResolvers = {
           where: { id },
           data: { archivedAt: null },
         })
-      })
+      }),
     ),
     updateWishOrderForWishList: logResolverInfo(
       requireAuth(async (_: any, { id, wishOrder }: { id: string; wishOrder: string[] }, ctx) => {
@@ -159,21 +159,19 @@ export const wishlistResolvers = {
             extensions: { code: 'NOT_OWNER' },
           })
         return syncWishOrder(ctx.prisma)({ wishOrder, wishListId: id })
-      })
+      }),
     ),
     createShare: logResolverInfo(
-      requireAuth(
-        (_: any, { invitedEmail, wishListId }: { invitedEmail: string; wishListId: string }, ctx) => {
-          return ctx.prisma.share.create({
-            data: { invitedEmail, wishListId, claimedWishIds: [] },
-          })
-        }
-      )
+      requireAuth((_: any, { invitedEmail, wishListId }: { invitedEmail: string; wishListId: string }, ctx) => {
+        return ctx.prisma.share.create({
+          data: { invitedEmail, wishListId, claimedWishIds: [] },
+        })
+      }),
     ),
     removeShare: logResolverInfo(
       requireAuth((_: any, { id }: { id: string }, ctx) => {
         return ctx.prisma.share.delete({ where: { id } })
-      })
+      }),
     ),
     sendShareEmails: logResolverInfo(
       requireAuth(async (_: any, { shareIds }: { shareIds: string[] }, ctx) => {
@@ -196,8 +194,8 @@ export const wishlistResolvers = {
                     wishListTitle: share.wishList.headline,
                     wishListLink: `${ctx.origin}/shared/${share.id}`,
                   },
-                })
-              )
+                }),
+              ),
             )
             return true
           } catch (error) {
@@ -206,7 +204,7 @@ export const wishlistResolvers = {
           }
         }
         throw new GraphQLError('Share not found', { extensions: { code: 'BAD_USER_INPUT' } })
-      })
+      }),
     ),
     claimWish: logResolverInfo(async (_: any, { id, wishId }: { id: string; wishId: string }, ctx) => {
       const wish = await ctx.prisma.wish.findFirst({
@@ -237,25 +235,23 @@ export const wishlistResolvers = {
         },
       })
     }),
-    removeWishClaim: logResolverInfo(
-      async (_: any, { id, wishId }: { id: string; wishId: string }, ctx) => {
-        const share = await ctx.prisma.share.findFirst({ where: { id } })
-        if (!share) {
-          throw new GraphQLError('Share not found', {
-            extensions: { code: 'NOT_FOUND' },
-          })
-        }
-        const indexOfClaimedWish = share.claimedWishIds.indexOf(wishId)
-        if (indexOfClaimedWish === -1) {
-          return share
-        }
-        return ctx.prisma.share.update({
-          where: { id },
-          data: {
-            claimedWishIds: remove(indexOfClaimedWish, 1, share.claimedWishIds),
-          },
+    removeWishClaim: logResolverInfo(async (_: any, { id, wishId }: { id: string; wishId: string }, ctx) => {
+      const share = await ctx.prisma.share.findFirst({ where: { id } })
+      if (!share) {
+        throw new GraphQLError('Share not found', {
+          extensions: { code: 'NOT_FOUND' },
         })
       }
-    ),
+      const indexOfClaimedWish = share.claimedWishIds.indexOf(wishId)
+      if (indexOfClaimedWish === -1) {
+        return share
+      }
+      return ctx.prisma.share.update({
+        where: { id },
+        data: {
+          claimedWishIds: remove(indexOfClaimedWish, 1, share.claimedWishIds),
+        },
+      })
+    }),
   },
 }

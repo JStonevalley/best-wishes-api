@@ -1,5 +1,5 @@
-import { GraphQLError, GraphQLResolveInfo } from 'graphql'
-import { Context } from './context'
+import { GraphQLError, type GraphQLResolveInfo } from 'graphql'
+import type { Context } from './context'
 import { logger } from './log'
 
 type GraphQLFieldResolver = (parent: any, args: any, context: Context, info: GraphQLResolveInfo) => any

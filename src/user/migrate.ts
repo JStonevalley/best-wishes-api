@@ -1,6 +1,6 @@
-import { PrismaClient, User } from '@prisma/client'
-import { readFile } from 'fs/promises'
-import path from 'path'
+import { readFile } from 'node:fs/promises'
+import path from 'node:path'
+import type { PrismaClient, User } from '@prisma/client'
 import { createWishList, syncWishOrder } from '../wishlist/utils'
 
 export const migrateV1Data = (prisma: PrismaClient) => async (user: User) => {

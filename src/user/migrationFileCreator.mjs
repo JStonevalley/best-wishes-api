@@ -1,9 +1,11 @@
-import { createRequire } from 'module'
+import { createRequire } from 'node:module'
+
 const require = createRequire(import.meta.url)
 const wishes = require('./bestwishes_wish.json')
 const wishLists = require('./bestwishes_wishList.json')
-import { writeFileSync } from 'fs'
-import { join } from 'path'
+
+import { writeFileSync } from 'node:fs'
+import { join } from 'node:path'
 
 const create = () => {
   const migration = wishLists
