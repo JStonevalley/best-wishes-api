@@ -1,6 +1,6 @@
+import { readFileSync } from 'node:fs'
+import { join } from 'node:path'
 import { makeExecutableSchema } from '@graphql-tools/schema'
-import { readFileSync } from 'fs'
-import { join } from 'path'
 import { GraphQLDateTime } from 'graphql-scalars'
 import { userResolvers } from './user/user'
 import { wishResolvers } from './wish/wish'

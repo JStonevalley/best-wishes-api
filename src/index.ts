@@ -1,8 +1,8 @@
 import { ApolloServer } from '@apollo/server'
 import { startStandaloneServer } from '@apollo/server/standalone'
-import { schema } from './schema'
-import { setupContext, Context } from './context'
+import { type Context, setupContext } from './context'
 import { logger } from './log'
+import { schema } from './schema'
 
 const PORT = Number(process.env.PORT) || 4000
 

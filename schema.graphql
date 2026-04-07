@@ -5,12 +5,28 @@ scalar DateTime
 
 type Mutation {
   archiveWishList(id: String!): WishList
-  changeWish(description: String, id: String!, image: String, link: String, price: ValueObjectInput, quantity: Int, title: String!): Wish
+  changeWish(
+    description: String
+    id: String!
+    image: String
+    link: String
+    price: ValueObjectInput
+    quantity: Int
+    title: String!
+  ): Wish
   changeWishList(headline: String!, id: String!): WishList
   claimWish(id: String!, wishId: String!): Share
   createShare(invitedEmail: String!, wishListId: String!): Share
   createUser(email: String!): User
-  createWish(description: String, image: String, link: String, price: ValueObjectInput, quantity: Int, title: String!, wishListId: String!): Wish
+  createWish(
+    description: String
+    image: String
+    link: String
+    price: ValueObjectInput
+    quantity: Int
+    title: String!
+    wishListId: String!
+  ): Wish
   createWishList(headline: String!): WishList
   removeAWish(id: String!): String
   removeShare(id: String!): Share
@@ -47,18 +63,26 @@ type User {
 }
 
 type ValueObject {
-  """Amount in minor units"""
+  """
+  Amount in minor units
+  """
   amount: Int!
 
-  """Currency 3 letter identifier according to ISO 4217"""
+  """
+  Currency 3 letter identifier according to ISO 4217
+  """
   currency: String!
 }
 
 input ValueObjectInput {
-  """Amount in minor units"""
+  """
+  Amount in minor units
+  """
   amount: Int!
 
-  """Currency 3 letter identifier according to ISO 4217"""
+  """
+  Currency 3 letter identifier according to ISO 4217
+  """
   currency: String!
 }
 

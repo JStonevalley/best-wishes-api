@@ -1,7 +1,7 @@
-import mjml2html from 'mjml'
+import { readFileSync } from 'node:fs'
+import path from 'node:path'
 import { compile } from 'handlebars'
-import { readFileSync } from 'fs'
-import path from 'path'
+import mjml2html from 'mjml'
 
 export interface ShareEmailContext {
   fromEmail: string

@@ -1,8 +1,8 @@
-import { PrismaClient, User } from '@prisma/client'
-import { initializeApp, applicationDefault } from 'firebase-admin/app'
+import { PrismaClient, type User } from '@prisma/client'
+import { applicationDefault, initializeApp } from 'firebase-admin/app'
 import { getAuth } from 'firebase-admin/auth'
-import { logger } from './log'
 import { GraphQLError } from 'graphql'
+import { logger } from './log'
 
 if (!process.env.FIREBASE_PROJECT_ID) logger.info('Missing FIREBASE_PROJECT_ID in environment')
 if (!process.env.GOOGLE_APPLICATION_CREDENTIALS) logger.info('Missing GOOGLE_APPLICATION_CREDENTIALS in environment')

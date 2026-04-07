@@ -25,7 +25,7 @@ export const wishResolvers = {
             extensions: { code: 'FORBIDDEN' },
           })
         return wish
-      })
+      }),
     ),
   },
   Mutation: {
@@ -50,7 +50,7 @@ export const wishResolvers = {
             wishListId: string
             price?: { amount: number; currency: string } | null
           },
-          ctx
+          ctx,
         ) => {
           const wishList = await ctx.prisma.wishList.findUnique({
             where: { id: wishListId },
@@ -81,8 +81,8 @@ export const wishResolvers = {
             },
           })
           return wish
-        }
-      )
+        },
+      ),
     ),
     changeWish: logResolverInfo(
       requireAuth(
@@ -105,7 +105,7 @@ export const wishResolvers = {
             quantity?: number | null
             price?: { amount: number; currency: string } | null
           },
-          ctx
+          ctx,
         ) => {
           const wish = await ctx.prisma.wish.findUnique({
             where: { id },
@@ -134,14 +134,14 @@ export const wishResolvers = {
               price: price || null,
             },
           })
-        }
-      )
+        },
+      ),
     ),
     removeAWish: logResolverInfo(
       requireAuth(async (_: any, { id }: { id: string }, ctx) => {
         await ctx.prisma.wish.delete({ where: { id } })
         return id
-      })
+      }),
     ),
   },
 }

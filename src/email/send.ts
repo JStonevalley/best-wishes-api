@@ -1,5 +1,5 @@
-import { MailerSend, Recipient, EmailParams, Sender } from 'mailersend'
-import { ShareEmailContext, renderEmailTemplate } from './render'
+import { EmailParams, MailerSend, Recipient, Sender } from 'mailersend'
+import { renderEmailTemplate, type ShareEmailContext } from './render'
 
 const mailersend = new MailerSend({
   apiKey: process.env.MAILERSEND_API_KEY || '',
