@@ -9,12 +9,8 @@
       "port": 4321,
       "request": "attach",
       "name": "Attach by Process ID",
-      "skipFiles": [
-        "<node_internals>/**"
-      ],
-      "outFiles": [
-        "${workspaceFolder}/**/*.js"
-      ]
+      "skipFiles": ["<node_internals>/**"],
+      "outFiles": ["${workspaceFolder}/**/*.js"]
     }
   ]
 }

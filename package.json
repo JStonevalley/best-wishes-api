@@ -6,7 +6,8 @@
   "scripts": {
     "prod": "tsx ./src/index.ts",
     "dev": "tsx --watch --inspect=4321 ./src/index.ts",
-    "lint": "eslint --ignore-path .eslintignore --ext .js,.ts .",
+    "lint": "biome check .",
+    "format": "biome format --write .",
     "codegen": "graphql-codegen --config codegen.ts",
     "generate": "prisma generate && graphql-codegen --config codegen.ts"
   },
@@ -23,17 +24,13 @@
   "homepage": "https://github.com/JStonevalley/best-wishes-api#readme",
   "type": "commonjs",
   "devDependencies": {
+    "@biomejs/biome": "^2.4.10",
     "@graphql-codegen/cli": "^6.2.1",
     "@graphql-codegen/typescript": "^5.0.9",
     "@graphql-codegen/typescript-resolvers": "^5.1.7",
     "@types/mjml": "^4.7.1",
     "@types/node": "^18.11.18",
     "@types/ramda": "^0.29.3",
-    "@typescript-eslint/eslint-plugin": "^5.56.0",
-    "@typescript-eslint/parser": "^5.56.0",
-    "eslint": "^8.36.0",
-    "eslint-config-prettier": "^8.8.0",
-    "eslint-plugin-prettier": "^4.2.1",
     "prisma": "^6.19.3",
     "tsx": "^4.21.0",
     "typescript": "^5.2.2"
@@ -49,7 +46,6 @@
     "handlebars": "^4.7.8",
     "mailersend": "^2.2.0",
     "mjml": "^4.14.1",
-    "prettier": "^2.8.7",
     "ramda": "^0.29.0",
     "winston": "^3.8.2"
   }
