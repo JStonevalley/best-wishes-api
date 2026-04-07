@@ -12,12 +12,14 @@ initializeApp({
   credential: applicationDefault(),
   projectId: process.env.FIREBASE_PROJECT_ID,
 })
-export interface ApolloContext {
+
+export interface Context {
   prisma: PrismaClient
   user: User | null
   googleUserId: string | null
   origin: string
 }
+
 export const setupContext = async ({ req }: any) => {
   const idToken = req.headers.authorization
   if (!idToken) {
