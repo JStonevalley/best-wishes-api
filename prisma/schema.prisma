@@ -34,17 +34,26 @@ model Share {
   claimedWishIds String[]
 }
 
+model PublicShare {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  wishList   WishList @relation(fields: [wishListId], references: [id])
+  wishListId String   @unique @db.ObjectId
+}
+
 model WishList {
-  id         String    @id @default(auto()) @map("_id") @db.ObjectId
-  createdAt  DateTime  @default(now())
-  updatedAt  DateTime  @updatedAt
-  archivedAt DateTime?
-  headline   String
-  wishes     Wish[]
-  wishOrder  String[]
-  shares     Share[]
-  user       User      @relation(fields: [userId], references: [id])
-  userId     String    @db.ObjectId
+  id          String       @id @default(auto()) @map("_id") @db.ObjectId
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  archivedAt  DateTime?
+  headline    String
+  wishes      Wish[]
+  wishOrder   String[]
+  shares      Share[]
+  publicShare PublicShare?
+  user        User         @relation(fields: [userId], references: [id])
+  userId      String       @db.ObjectId
 }
 
 model User {

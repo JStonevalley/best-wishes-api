@@ -8,6 +8,7 @@ export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: 
 export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> };
 export type MakeEmpty<T extends { [key: string]: unknown }, K extends keyof T> = { [_ in K]?: never };
 export type Incremental<T> = T | { [P in keyof T]?: P extends ' $fragmentName' | '__typename' ? T[P] : never };
+export type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
 export type RequireFields<T, K extends keyof T> = Omit<T, K> & { [P in K]-?: NonNullable<T[P]> };
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
@@ -26,10 +27,13 @@ export type Mutation = {
   changeWish?: Maybe<Wish>;
   changeWishList?: Maybe<WishList>;
   claimWish?: Maybe<Share>;
+  createPublicShare?: Maybe<PublicShare>;
   createShare?: Maybe<Share>;
   createUser?: Maybe<User>;
   createWish?: Maybe<Wish>;
   createWishList?: Maybe<WishList>;
+  deletePublicShare?: Maybe<PublicShare>;
+  redeemPublicShare?: Maybe<Share>;
   removeAWish?: Maybe<Scalars['String']['output']>;
   removeShare?: Maybe<Share>;
   removeWishClaim?: Maybe<Share>;
@@ -67,6 +71,11 @@ export type MutationClaimWishArgs = {
 };
 
 
+export type MutationCreatePublicShareArgs = {
+  wishListId: Scalars['String']['input'];
+};
+
+
 export type MutationCreateShareArgs = {
   invitedEmail: Scalars['String']['input'];
   wishListId: Scalars['String']['input'];
@@ -91,6 +100,16 @@ export type MutationCreateWishArgs = {
 
 export type MutationCreateWishListArgs = {
   headline: Scalars['String']['input'];
+};
+
+
+export type MutationDeletePublicShareArgs = {
+  id: Scalars['String']['input'];
+};
+
+
+export type MutationRedeemPublicShareArgs = {
+  publicShareId: Scalars['String']['input'];
 };
 
 
@@ -125,6 +144,14 @@ export type MutationUpdateWishOrderForWishListArgs = {
   wishOrder: Array<Scalars['String']['input']>;
 };
 
+export type PublicShare = {
+  __typename?: 'PublicShare';
+  createdAt: Scalars['DateTime']['output'];
+  id: Scalars['ID']['output'];
+  updatedAt: Scalars['DateTime']['output'];
+  wishList: WishList;
+};
+
 export type Query = {
   __typename?: 'Query';
   getCurrentUser?: Maybe<User>;
@@ -132,6 +159,7 @@ export type Query = {
   getOwnWish?: Maybe<Wish>;
   getOwnWishList?: Maybe<WishList>;
   getOwnWishLists?: Maybe<Array<Maybe<WishList>>>;
+  getPublicShare?: Maybe<PublicShare>;
   getShare?: Maybe<Share>;
 };
 
@@ -142,6 +170,11 @@ export type QueryGetOwnWishArgs = {
 
 
 export type QueryGetOwnWishListArgs = {
+  id: Scalars['String']['input'];
+};
+
+
+export type QueryGetPublicShareArgs = {
   id: Scalars['String']['input'];
 };
 
@@ -204,6 +237,7 @@ export type WishList = {
   createdAt: Scalars['DateTime']['output'];
   headline: Scalars['String']['output'];
   id: Scalars['ID']['output'];
+  publicShare?: Maybe<PublicShare>;
   shares: Array<Share>;
   updatedAt: Scalars['DateTime']['output'];
   user: User;
@@ -289,6 +323,7 @@ export type ResolversTypes = {
   ID: ResolverTypeWrapper<Scalars['ID']['output']>;
   Int: ResolverTypeWrapper<Scalars['Int']['output']>;
   Mutation: ResolverTypeWrapper<Record<PropertyKey, never>>;
+  PublicShare: ResolverTypeWrapper<Omit<PublicShare, 'wishList'> & { wishList: ResolversTypes['WishList'] }>;
   Query: ResolverTypeWrapper<Record<PropertyKey, never>>;
   Share: ResolverTypeWrapper<PrismaShare>;
   String: ResolverTypeWrapper<Scalars['String']['output']>;
@@ -306,6 +341,7 @@ export type ResolversParentTypes = {
   ID: Scalars['ID']['output'];
   Int: Scalars['Int']['output'];
   Mutation: Record<PropertyKey, never>;
+  PublicShare: Omit<PublicShare, 'wishList'> & { wishList: ResolversParentTypes['WishList'] };
   Query: Record<PropertyKey, never>;
   Share: PrismaShare;
   String: Scalars['String']['output'];
@@ -325,10 +361,13 @@ export type MutationResolvers<ContextType = Context, ParentType extends Resolver
   changeWish?: Resolver<Maybe<ResolversTypes['Wish']>, ParentType, ContextType, RequireFields<MutationChangeWishArgs, 'id' | 'title'>>;
   changeWishList?: Resolver<Maybe<ResolversTypes['WishList']>, ParentType, ContextType, RequireFields<MutationChangeWishListArgs, 'headline' | 'id'>>;
   claimWish?: Resolver<Maybe<ResolversTypes['Share']>, ParentType, ContextType, RequireFields<MutationClaimWishArgs, 'id' | 'wishId'>>;
+  createPublicShare?: Resolver<Maybe<ResolversTypes['PublicShare']>, ParentType, ContextType, RequireFields<MutationCreatePublicShareArgs, 'wishListId'>>;
   createShare?: Resolver<Maybe<ResolversTypes['Share']>, ParentType, ContextType, RequireFields<MutationCreateShareArgs, 'invitedEmail' | 'wishListId'>>;
   createUser?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType, RequireFields<MutationCreateUserArgs, 'email'>>;
   createWish?: Resolver<Maybe<ResolversTypes['Wish']>, ParentType, ContextType, RequireFields<MutationCreateWishArgs, 'title' | 'wishListId'>>;
   createWishList?: Resolver<Maybe<ResolversTypes['WishList']>, ParentType, ContextType, RequireFields<MutationCreateWishListArgs, 'headline'>>;
+  deletePublicShare?: Resolver<Maybe<ResolversTypes['PublicShare']>, ParentType, ContextType, RequireFields<MutationDeletePublicShareArgs, 'id'>>;
+  redeemPublicShare?: Resolver<Maybe<ResolversTypes['Share']>, ParentType, ContextType, RequireFields<MutationRedeemPublicShareArgs, 'publicShareId'>>;
   removeAWish?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType, RequireFields<MutationRemoveAWishArgs, 'id'>>;
   removeShare?: Resolver<Maybe<ResolversTypes['Share']>, ParentType, ContextType, RequireFields<MutationRemoveShareArgs, 'id'>>;
   removeWishClaim?: Resolver<Maybe<ResolversTypes['Share']>, ParentType, ContextType, RequireFields<MutationRemoveWishClaimArgs, 'id' | 'wishId'>>;
@@ -337,12 +376,20 @@ export type MutationResolvers<ContextType = Context, ParentType extends Resolver
   updateWishOrderForWishList?: Resolver<Maybe<ResolversTypes['WishList']>, ParentType, ContextType, RequireFields<MutationUpdateWishOrderForWishListArgs, 'id' | 'wishOrder'>>;
 };
 
+export type PublicShareResolvers<ContextType = Context, ParentType extends ResolversParentTypes['PublicShare'] = ResolversParentTypes['PublicShare']> = {
+  createdAt?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
+  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  updatedAt?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
+  wishList?: Resolver<ResolversTypes['WishList'], ParentType, ContextType>;
+};
+
 export type QueryResolvers<ContextType = Context, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {
   getCurrentUser?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType>;
   getOwnShares?: Resolver<Maybe<Array<Maybe<ResolversTypes['Share']>>>, ParentType, ContextType>;
   getOwnWish?: Resolver<Maybe<ResolversTypes['Wish']>, ParentType, ContextType, RequireFields<QueryGetOwnWishArgs, 'id'>>;
   getOwnWishList?: Resolver<Maybe<ResolversTypes['WishList']>, ParentType, ContextType, RequireFields<QueryGetOwnWishListArgs, 'id'>>;
   getOwnWishLists?: Resolver<Maybe<Array<Maybe<ResolversTypes['WishList']>>>, ParentType, ContextType>;
+  getPublicShare?: Resolver<Maybe<ResolversTypes['PublicShare']>, ParentType, ContextType, RequireFields<QueryGetPublicShareArgs, 'id'>>;
   getShare?: Resolver<Maybe<ResolversTypes['Share']>, ParentType, ContextType, RequireFields<QueryGetShareArgs, 'id'>>;
 };
 
@@ -386,6 +433,7 @@ export type WishListResolvers<ContextType = Context, ParentType extends Resolver
   createdAt?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
   headline?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  publicShare?: Resolver<Maybe<ResolversTypes['PublicShare']>, ParentType, ContextType>;
   shares?: Resolver<Array<ResolversTypes['Share']>, ParentType, ContextType>;
   updatedAt?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
   user?: Resolver<ResolversTypes['User'], ParentType, ContextType>;
@@ -396,6 +444,7 @@ export type WishListResolvers<ContextType = Context, ParentType extends Resolver
 export type Resolvers<ContextType = Context> = {
   DateTime?: GraphQLScalarType;
   Mutation?: MutationResolvers<ContextType>;
+  PublicShare?: PublicShareResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;
   Share?: ShareResolvers<ContextType>;
   User?: UserResolvers<ContextType>;

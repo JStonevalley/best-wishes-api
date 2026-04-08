@@ -16,6 +16,7 @@ type Mutation {
   ): Wish
   changeWishList(headline: String!, id: String!): WishList
   claimWish(id: String!, wishId: String!): Share
+  createPublicShare(wishListId: String!): PublicShare
   createShare(invitedEmail: String!, wishListId: String!): Share
   createUser(email: String!): User
   createWish(
@@ -28,6 +29,8 @@ type Mutation {
     wishListId: String!
   ): Wish
   createWishList(headline: String!): WishList
+  deletePublicShare(id: String!): PublicShare
+  redeemPublicShare(publicShareId: String!): Share
   removeAWish(id: String!): String
   removeShare(id: String!): Share
   removeWishClaim(id: String!, wishId: String!): Share
@@ -42,7 +45,15 @@ type Query {
   getOwnWish(id: String!): Wish
   getOwnWishList(id: String!): WishList
   getOwnWishLists: [WishList]
+  getPublicShare(id: String!): PublicShare
   getShare(id: String!): Share
+}
+
+type PublicShare {
+  createdAt: DateTime!
+  id: ID!
+  updatedAt: DateTime!
+  wishList: WishList!
 }
 
 type Share {
@@ -104,6 +115,7 @@ type WishList {
   createdAt: DateTime!
   headline: String!
   id: ID!
+  publicShare: PublicShare
   shares: [Share!]!
   updatedAt: DateTime!
   user: User!
