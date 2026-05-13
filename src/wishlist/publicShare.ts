@@ -8,12 +8,6 @@ export const publicShareResolvers = {
       return ctx.prisma.wishList.findUniqueOrThrow({ where: { id: parent.wishListId } })
     },
   },
-  WishList: {
-    publicShare: async (parent: any, _: any, ctx: any) => {
-      if (parent.publicShare !== undefined) return parent.publicShare
-      return ctx.prisma.publicShare.findUnique({ where: { wishListId: parent.id } })
-    },
-  },
   Query: {
     getPublicShare: logResolverInfo(async (_: any, { id }: { id: string }, ctx) => {
       return ctx.prisma.publicShare.findUnique({

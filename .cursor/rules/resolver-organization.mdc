@@ -1,0 +1,52 @@
+---
+description: How GraphQL resolvers are organized across files
+globs: src/**/*.ts
+alwaysApply: false
+---
+
+# Resolver Organization
+
+Each GraphQL type has a "home" module under `src/<domain>/<type>.ts` that
+exports `<type>Resolvers`. **All resolvers for a type's fields live in that
+type's home module** — regardless of what type the field returns.
+
+This includes back-pointer fields. A `Share.wishList` field resolver lives in
+`share.ts` (Share's home), not in `wishlist.ts` — even though it resolves to a
+`WishList`.
+
+## Where things live
+
+- `Foo.<field>` resolvers → `<foo>.ts`
+- `Query.<field>` and `Mutation.<field>` resolvers → the home module of the
+  type most central to that operation (e.g. `createShare` lives in `share.ts`)
+- Each home module is wired into `src/schema.ts` via its `<type>Resolvers`
+  export
+
+## Example
+
+```ts
+// src/wishlist/share.ts — owns the Share type
+export const shareResolvers = {
+  Share: {
+    wishList: async (parent, _, ctx) => { /* ... */ },
+  },
+  Mutation: {
+    createShare: /* ... */,
+  },
+}
+
+// src/wishlist/wishlist.ts — owns the WishList type
+export const wishlistResolvers = {
+  WishList: {
+    shares: async (parent, _, ctx) => { /* ... */ },
+    publicShare: async (parent, _, ctx) => { /* ... */ },
+  },
+}
+```
+
+## Why
+
+Locating every resolver for a given type is a single-file lookup, and adding
+a new type to the schema is a self-contained change: create the home module,
+add its resolvers (including any back-pointers from related types), and
+register it in `src/schema.ts`.
